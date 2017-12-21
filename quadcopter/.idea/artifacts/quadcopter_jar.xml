@@ -1,0 +1,15 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="quadcopter:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/quadcopter_jar</output-path>
+    <root id="archive" name="quadcopter.jar">
+      <element id="module-output" name="quadcopter" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/pi4j/pi4j-core/1.2-SNAPSHOT/pi4j-core-1.2-SNAPSHOT.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/tinylog/tinylog/1.2/tinylog-1.2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/diozero/diozero-core/0.11-SNAPSHOT/diozero-core-0.11-SNAPSHOT.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/pi4j/pi4j-gpio-extension/1.2-SNAPSHOT/pi4j-gpio-extension-1.2-SNAPSHOT.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/com/pi4j/pi4j-device/1.2-SNAPSHOT/pi4j-device-1.2-SNAPSHOT.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/log4j/log4j/1.2.17/log4j-1.2.17.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/apache/commons/commons-math3/3.6.1/commons-math3-3.6.1.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

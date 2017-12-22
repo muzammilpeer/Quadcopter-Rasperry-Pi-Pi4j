@@ -3,6 +3,7 @@ package com.muzammilpeer.quadcopter;
 
 import com.muzammilpeer.quadcopter.diozero.MPU6050;
 import com.muzammilpeer.quadcopter.diozero.Tools;
+import com.muzammilpeer.quadcopter.sensor.GY91;
 
 import java.io.IOException;
 
@@ -25,8 +26,9 @@ public class App {
 ////        Thread.sleep(5 * 1000);
 //        controller.disArm();
 
-        testMPU6050();
-
+//        testMPU6050();
+        GY91 gy91 = new GY91();
+        gy91.readDataFromSensors();
     }
 
 

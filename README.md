@@ -7,7 +7,7 @@ Hardware:
 - 4 Brushless motor (1000kv)
 - 4 Properllor (10inch)
 - 3S Lpio Battery (5500mah or 2200mah) 11.1 volt, 30C max
-- MPU-6050 Sensor 6 DOF (Accelerometer, Gyroscope) 
+- MPU-6050 Sensor 6 DOF (Accelerometer, Gyroscope) or GY-91[10 DOF] (included with 2 modules MPU-9250 and BMP-280)
 - Raspberry Pi (3 Model B, or Pi-Zero-W) which has builtin bluetooth and wifi. for easy setup.
 - Raspberry Pi camera
 - Servo Motor (Tower Pro - MicroServo 9g) or (Tower Pro - MG-996R)
@@ -30,6 +30,9 @@ https://github.com/muzammilpeer/ESC-Pi4j
 
 For MPU-6050(Java code):
 - comming soon
+
+For GY-91 [10 DOF] (included with 2 modules MPU-9250 and BMP-280)(Java code):
+https://github.com/muzammilpeer/GY-91-PI4J
 
 Quadcopter run loop app:
 - comming soon

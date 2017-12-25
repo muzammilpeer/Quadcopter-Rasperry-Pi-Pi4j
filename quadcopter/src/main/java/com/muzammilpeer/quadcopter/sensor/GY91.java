@@ -9,7 +9,7 @@ public class GY91 {
         int[] ACCxyz = new int[3];
         int[] GYRxyz = new int[3];
         int[] MAGxyz = new int[3];
-        float[] MagDes = new float[3];
+        double[] MagDes = new double[3];
         // float CalDes1[3];
         // float CalDes2[3];
         // float SelDes[6];
@@ -26,8 +26,8 @@ public class GY91 {
         mpu9250.MPU9250();
         mpu9250.initMPU9250();
         mpu9250.initAK8963(MagDes);
-        // calibrateMPU9250(CalDes1,CalDes2);
-        // MPU9250SelfTest(SelDes);
+//        mpu9250.calibrateMPU9250(CalDes1, CalDes2);
+//        mpu9250.MPU9250SelfTest(SelDes);
         while (true) {
             mpu9250.readAccelData(ACCxyz);
             mpu9250.readGyroData(GYRxyz);
@@ -42,6 +42,14 @@ public class GY91 {
             System.out.printf("Temp:\t\t%2.2f `C\r\n", bmp280.bmp.temperature);
             System.out.printf("Pressure:\t%5.4f mbar\r\n", bmp280.bmp.pressure);
             System.out.printf("Altitude:\t%5.3f m\r\n\r\n", bmp280.bmp.altitude);
+
+
+            System.out.printf("Roll Yaw Pitch:\r\n");
+            mpu9250.MadgwickQuaternionUpdate(ACCxyz[0], ACCxyz[1], ACCxyz[2], GYRxyz[0], GYRxyz[1], GYRxyz[2], MAGxyz[0], MAGxyz[1], MAGxyz[2]);
+            mpu9250.MahonyQuaternionUpdate(ACCxyz[0], ACCxyz[1], ACCxyz[2], GYRxyz[0], GYRxyz[1], GYRxyz[2], MAGxyz[0], MAGxyz[1], MAGxyz[2]);
+            mpu9250.calculateYawRollPicth();
+            System.out.printf("Roll = %5.4f Yaw = %5.4f Pitch = %5.4f ", mpu9250.roll, mpu9250.yaw, mpu9250.pitch);
+
             delay(100);
         }
     }

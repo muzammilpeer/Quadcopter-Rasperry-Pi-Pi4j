@@ -13,7 +13,9 @@
         <version>0.11-SNAPSHOT</version>
         <relativePath></relativePath>
     </parent>
-
+    <properties>
+        <pigpioj.version>2.2</pigpioj.version>
+    </properties>
     <dependencies>
         <!-- START SNIPPET: maven-dependency-snippet -->
         <dependency>
@@ -42,6 +44,11 @@
         <dependency>
             <groupId>com.diozero</groupId>
             <artifactId>diozero-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>uk.pigpioj</groupId>
+            <artifactId>pigpioj-java</artifactId>
+            <version>${pigpioj.version}</version>
         </dependency>
 
         <dependency>

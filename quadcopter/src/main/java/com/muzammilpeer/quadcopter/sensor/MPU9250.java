@@ -10,7 +10,9 @@ import static com.muzammilpeer.quadcopter.sensor.enums.Gscale.GFS_250DPS;
 import static com.muzammilpeer.quadcopter.sensor.enums.Mscale.MFS_16BITS;
 import static com.pi4j.wiringpi.Gpio.delay;
 import static com.pi4j.wiringpi.I2C.*;
+import static java.lang.Math.atan2;
 import static java.lang.Math.pow;
+import static java.lang.StrictMath.asin;
 import static java.lang.StrictMath.sqrt;
 
 
@@ -194,32 +196,32 @@ public class MPU9250 {
     int accelCount[] = new int[3];  // Stores the 16-bit signed accelerometer sensor output
     int gyroCount[] = new int[3];   // Stores the 16-bit signed gyro sensor output
     int magCount[] = new int[3];    // Stores the 16-bit signed magnetometer sensor output
-    float magCalibration[] = {0, 0, 0};
-    float magbias[] = {0, 0, 0};  // Factory mag calibration and mag bias
-    float gyroBias[] = {0, 0, 0};
-    float accelBias[] = {0, 0, 0}; // Bias corrections for gyro and accelerometer
-    float ax, ay, az, gx, gy, gz, mx, my, mz; // variables to hold latest sensor data values
+    double magCalibration[] = {0, 0, 0};
+    double magbias[] = {0, 0, 0};  // Factory mag calibration and mag bias
+    double gyroBias[] = {0, 0, 0};
+    double accelBias[] = {0, 0, 0}; // Bias corrections for gyro and accelerometer
+    double ax, ay, az, gx, gy, gz, mx, my, mz; // variables to hold latest sensor data values
     int tempCount;   // Stores the real internal chip temperature in degrees Celsius
-    float temperature;
-    float SelfTest[] = new float[6];
+    double temperature;
+    double SelfTest[] = new double[6];
 
     int delt_t = 0; // used to control display output rate
     int count = 0;  // used to control display output rate
 
 
-    float Kp = 2.0f * 5.0f;// these are the free parameters in the Mahony filter and fusion scheme, Kp for proportional feedback, Ki for integral
-    float Ki = 0.0f;
+    double Kp = 2.0f * 5.0f;// these are the free parameters in the Mahony filter and fusion scheme, Kp for proportional feedback, Ki for integral
+    double Ki = 0.0f;
 
-    float pitch, yaw, roll;
-    float deltat = 0.0f;                             // integration interval for both filter schemes
+    double pitch, yaw, roll;
+    double deltat = 0.0f;                             // integration interval for both filter schemes
     int lastUpdate = 0, firstUpdate = 0, Now = 0;    // used to calculate integration interval                               // used to calculate integration interval
     double q[] = {1.0f, 0.0f, 0.0f, 0.0f};           // vector to hold quaternion
-    float eInt[] = {0.0f, 0.0f, 0.0f};              // vector to hold integral error for Mahony method
+    double eInt[] = {0.0f, 0.0f, 0.0f};              // vector to hold integral error for Mahony method
 
     int fdAK8963;
     int fdMPU9250;
     double beta, zeta;
-    float PI, GyroMeasError, GyroMeasDrift;
+    double PI, GyroMeasError, GyroMeasDrift;
 
     void MPU9250() {
         // parameters for 6 DoF sensor fusion calculations
@@ -339,18 +341,18 @@ public class MPU9250 {
         //peer
 //        readBytes(MPU9250_ADDRESS, ACCEL_XOUT_H, 6, rawData[0]);  // Read the six raw data registers into data array
         readBytes(MPU9250_ADDRESS, ACCEL_XOUT_H, 6, rawData);  // Read the six raw data registers into data array
-        destination[0] = (int) (((int) rawData[0] << 8) | rawData[1]);  // Turn the MSB and LSB into a signed 16-bit value
-        destination[1] = (int) (((int) rawData[2] << 8) | rawData[3]);
-        destination[2] = (int) (((int) rawData[4] << 8) | rawData[5]);
+        destination[0] = ((rawData[0] << 8) | rawData[1]);  // Turn the MSB and LSB into a signed 16-bit value
+        destination[1] = ((rawData[2] << 8) | rawData[3]);
+        destination[2] = ((rawData[4] << 8) | rawData[5]);
     }
 
     void readGyroData(int destination[]) {
         int rawData[] = new int[6];  // x/y/z gyro register data stored here
 //        readBytes(MPU9250_ADDRESS, GYRO_XOUT_H, 6, rawData[0])
         readBytes(MPU9250_ADDRESS, GYRO_XOUT_H, 6, rawData);  // Read the six raw data registers sequentially into data array
-        destination[0] = (int) (((int) rawData[0] << 8) | rawData[1]);  // Turn the MSB and LSB into a signed 16-bit value
-        destination[1] = (int) (((int) rawData[2] << 8) | rawData[3]);
-        destination[2] = (int) (((int) rawData[4] << 8) | rawData[5]);
+        destination[0] = ((rawData[0] << 8) | rawData[1]);  // Turn the MSB and LSB into a signed 16-bit value
+        destination[1] = ((rawData[2] << 8) | rawData[3]);
+        destination[2] = ((rawData[4] << 8) | rawData[5]);
     }
 
     void readMagData(int destination[]) {
@@ -365,9 +367,9 @@ public class MPU9250 {
             // muzammilpeer
 //            if (!(c & 0x08)) { // Check if magnetic sensor overflow set, if not then report data
             if (!((c & 0x08) == 1)) { // Check if magnetic sensor overflow set, if not then report data
-                destination[0] = (int) (((int) rawData[1] << 8) | rawData[0]);  // Turn the MSB and LSB into a signed 16-bit value
-                destination[1] = (int) (((int) rawData[3] << 8) | rawData[2]);  // Data stored as little Endian
-                destination[2] = (int) (((int) rawData[5] << 8) | rawData[4]);
+                destination[0] = ((rawData[1] << 8) | rawData[0]);  // Turn the MSB and LSB into a signed 16-bit value
+                destination[1] = ((rawData[3] << 8) | rawData[2]);  // Data stored as little Endian
+                destination[2] = ((rawData[5] << 8) | rawData[4]);
             }
         }
     }
@@ -376,7 +378,7 @@ public class MPU9250 {
         int rawData[] = new int[2];  // x/y/z gyro register data stored here
 //        readBytes(MPU9250_ADDRESS, TEMP_OUT_H, 2, & rawData[0])
         readBytes(MPU9250_ADDRESS, TEMP_OUT_H, 2, rawData);  // Read the two raw data registers sequentially into data array
-        return (int) (((int) rawData[0]) << 8 | rawData[1]);  // Turn the MSB and LSB into a 16-bit value
+        return ((rawData[0]) << 8 | rawData[1]);  // Turn the MSB and LSB into a 16-bit value
     }
 
     //peer
@@ -392,7 +394,7 @@ public class MPU9250 {
         delay(100);
     }
 
-    void initAK8963(float destination[]) {
+    void initAK8963(double destination[]) {
         // First extract the factory calibration for each magnetometer axis
         int rawData[] = new int[3];  // x/y/z gyro calibration data stored here
         writeByte(AK8963_ADDRESS, AK8963_CNTL, 0x00); // Power down magnetometer
@@ -402,9 +404,9 @@ public class MPU9250 {
         //peer
 //        readBytes(AK8963_ADDRESS, AK8963_ASAX, 3, & rawData[0]);  // Read the x-, y-, and z-axis calibration values
         readBytes(AK8963_ADDRESS, AK8963_ASAX, 3, rawData);  // Read the x-, y-, and z-axis calibration values
-        destination[0] = (float) (rawData[0] - 128) / 256.0f + 1.0f;   // Return x-axis sensitivity adjustment values, etc.
-        destination[1] = (float) (rawData[1] - 128) / 256.0f + 1.0f;
-        destination[2] = (float) (rawData[2] - 128) / 256.0f + 1.0f;
+        destination[0] = (double) (rawData[0] - 128) / 256.0f + 1.0f;   // Return x-axis sensitivity adjustment values, etc.
+        destination[1] = (double) (rawData[1] - 128) / 256.0f + 1.0f;
+        destination[2] = (double) (rawData[2] - 128) / 256.0f + 1.0f;
         writeByte(AK8963_ADDRESS, AK8963_CNTL, 0x00); // Power down magnetometer
         delay(10);
         // Configure the magnetometer for continuous read and highest resolution
@@ -465,7 +467,7 @@ public class MPU9250 {
 
     // Function which accumulates gyro and accelerometer data after device initialization. It calculates the average
     // of the at-rest readings and then loads the resulting offsets into accelerometer and gyro bias registers.
-    void calibrateMPU9250(float dest1[], float dest2[]) {
+    void calibrateMPU9250(double dest1[], double dest2[]) {
         int data[] = new int[12]; // data array to hold accelerometer and gyro x, y, z, data
         int ii, packet_count, fifo_count;
         int gyro_bias[] = {0, 0, 0}, accel_bias[] = {0, 0, 0};
@@ -514,12 +516,12 @@ public class MPU9250 {
             //peer
 //            readBytes(MPU9250_ADDRESS, FIFO_R_W, 12, & data[0]); // read data for averaging
             readBytes(MPU9250_ADDRESS, FIFO_R_W, 12, data); // read data for averaging
-            accel_temp[0] = (int) (((int) data[0] << 8) | data[1]);  // Form signed 16-bit integer for each sample in FIFO
-            accel_temp[1] = (int) (((int) data[2] << 8) | data[3]);
-            accel_temp[2] = (int) (((int) data[4] << 8) | data[5]);
-            gyro_temp[0] = (int) (((int) data[6] << 8) | data[7]);
-            gyro_temp[1] = (int) (((int) data[8] << 8) | data[9]);
-            gyro_temp[2] = (int) (((int) data[10] << 8) | data[11]);
+            accel_temp[0] = ((data[0] << 8) | data[1]);  // Form signed 16-bit integer for each sample in FIFO
+            accel_temp[1] = ((data[2] << 8) | data[3]);
+            accel_temp[2] = ((data[4] << 8) | data[5]);
+            gyro_temp[0] = ((data[6] << 8) | data[7]);
+            gyro_temp[1] = ((data[8] << 8) | data[9]);
+            gyro_temp[2] = ((data[10] << 8) | data[11]);
 
             accel_bias[0] += (int) accel_temp[0]; // Sum individual signed 16-bit biases to get accumulated signed 32-bit biases
             accel_bias[1] += (int) accel_temp[1];
@@ -559,9 +561,9 @@ public class MPU9250 {
 		writeByte(MPU9250_ADDRESS, ZG_OFFSET_H, data[4]);
 		writeByte(MPU9250_ADDRESS, ZG_OFFSET_L, data[5]);
 		*/
-        dest1[0] = (float) gyro_bias[0] / (float) gyrosensitivity; // construct gyro bias in deg/s for later manual subtraction
-        dest1[1] = (float) gyro_bias[1] / (float) gyrosensitivity;
-        dest1[2] = (float) gyro_bias[2] / (float) gyrosensitivity;
+        dest1[0] = (double) gyro_bias[0] / (double) gyrosensitivity; // construct gyro bias in deg/s for later manual subtraction
+        dest1[1] = (double) gyro_bias[1] / (double) gyrosensitivity;
+        dest1[2] = (double) gyro_bias[2] / (double) gyrosensitivity;
 
         // Construct the accelerometer biases for push to the hardware accelerometer bias registers. These registers contain
         // factory trim values which must be added to the calculated accelerometer biases; on boot up these registers will hold
@@ -617,9 +619,9 @@ public class MPU9250 {
 		writeByte(MPU9250_ADDRESS, ZA_OFFSET_L, data[5]);
 		*/
         // Output scaled accelerometer biases for manual subtraction in the main program
-        dest2[0] = (float) accel_bias[0] / (float) accelsensitivity;
-        dest2[1] = (float) accel_bias[1] / (float) accelsensitivity;
-        dest2[2] = (float) accel_bias[2] / (float) accelsensitivity;
+        dest2[0] = (double) accel_bias[0] / (double) accelsensitivity;
+        dest2[1] = (double) accel_bias[1] / (double) accelsensitivity;
+        dest2[2] = (double) accel_bias[2] / (double) accelsensitivity;
     }
 
 
@@ -646,16 +648,16 @@ public class MPU9250 {
             //peer
 //            readBytes(MPU9250_ADDRESS, ACCEL_XOUT_H, 6, & rawData[0])
             readBytes(MPU9250_ADDRESS, ACCEL_XOUT_H, 6, rawData); // Read the six raw data registers into data array
-            aAvg[0] += (int) (((int) rawData[0] << 8) | rawData[1]); // Turn the MSB and LSB into a signed 16-bit value
-            aAvg[1] += (int) (((int) rawData[2] << 8) | rawData[3]);
-            aAvg[2] += (int) (((int) rawData[4] << 8) | rawData[5]);
+            aAvg[0] += ((rawData[0] << 8) | rawData[1]); // Turn the MSB and LSB into a signed 16-bit value
+            aAvg[1] += ((rawData[2] << 8) | rawData[3]);
+            aAvg[2] += ((rawData[4] << 8) | rawData[5]);
 
             //peer
 //            readBytes(MPU9250_ADDRESS, GYRO_XOUT_H, 6, & rawData[0])
             readBytes(MPU9250_ADDRESS, GYRO_XOUT_H, 6, rawData); // Read the six raw data registers sequentially into data array
-            gAvg[0] += (int) (((int) rawData[0] << 8) | rawData[1]); // Turn the MSB and LSB into a signed 16-bit value
-            gAvg[1] += (int) (((int) rawData[2] << 8) | rawData[3]);
-            gAvg[2] += (int) (((int) rawData[4] << 8) | rawData[5]);
+            gAvg[0] += ((rawData[0] << 8) | rawData[1]); // Turn the MSB and LSB into a signed 16-bit value
+            gAvg[1] += ((rawData[2] << 8) | rawData[3]);
+            gAvg[2] += ((rawData[4] << 8) | rawData[5]);
         }
 
         for (int ii = 0; ii < 3; ii++) { // Get average of 200 values and store as average current readings
@@ -673,16 +675,16 @@ public class MPU9250 {
             //peer
 //            readBytes(MPU9250_ADDRESS, ACCEL_XOUT_H, 6, & rawData[0])
             readBytes(MPU9250_ADDRESS, ACCEL_XOUT_H, 6, rawData); // Read the six raw data registers into data array
-            aSTAvg[0] += (int) (((int) rawData[0] << 8) | rawData[1]); // Turn the MSB and LSB into a signed 16-bit value
-            aSTAvg[1] += (int) (((int) rawData[2] << 8) | rawData[3]);
-            aSTAvg[2] += (int) (((int) rawData[4] << 8) | rawData[5]);
+            aSTAvg[0] += ((rawData[0] << 8) | rawData[1]); // Turn the MSB and LSB into a signed 16-bit value
+            aSTAvg[1] += ((rawData[2] << 8) | rawData[3]);
+            aSTAvg[2] += ((rawData[4] << 8) | rawData[5]);
 
             //peer
 //            readBytes(MPU9250_ADDRESS, GYRO_XOUT_H, 6, & rawData[0])
             readBytes(MPU9250_ADDRESS, GYRO_XOUT_H, 6, rawData); // Read the six raw data registers sequentially into data array
-            gSTAvg[0] += (int) (((int) rawData[0] << 8) | rawData[1]); // Turn the MSB and LSB into a signed 16-bit value
-            gSTAvg[1] += (int) (((int) rawData[2] << 8) | rawData[3]);
-            gSTAvg[2] += (int) (((int) rawData[4] << 8) | rawData[5]);
+            gSTAvg[0] += ((rawData[0] << 8) | rawData[1]); // Turn the MSB and LSB into a signed 16-bit value
+            gSTAvg[1] += ((rawData[2] << 8) | rawData[3]);
+            gSTAvg[2] += ((rawData[4] << 8) | rawData[5]);
         }
 
         for (int ii = 0; ii < 3; ii++) { // Get average of 200 values and store as average self-test readings
@@ -704,12 +706,12 @@ public class MPU9250 {
         selfTest[5] = readByte(MPU9250_ADDRESS, SELF_TEST_Z_GYRO); // Z-axis gyro self-test results
 
         // Retrieve factory self-test value from self-test code reads
-        factoryTrim[0] = (double) (2620 / 1 << FS) * (pow(1.01, ((float) selfTest[0] - 1.0))); // FT[Xa] factory trim calculation
-        factoryTrim[1] = (double) (2620 / 1 << FS) * (pow(1.01, ((float) selfTest[1] - 1.0))); // FT[Ya] factory trim calculation
-        factoryTrim[2] = (double) (2620 / 1 << FS) * (pow(1.01, ((float) selfTest[2] - 1.0))); // FT[Za] factory trim calculation
-        factoryTrim[3] = (double) (2620 / 1 << FS) * (pow(1.01, ((float) selfTest[3] - 1.0))); // FT[Xg] factory trim calculation
-        factoryTrim[4] = (double) (2620 / 1 << FS) * (pow(1.01, ((float) selfTest[4] - 1.0))); // FT[Yg] factory trim calculation
-        factoryTrim[5] = (double) (2620 / 1 << FS) * (pow(1.01, ((float) selfTest[5] - 1.0))); // FT[Zg] factory trim calculation
+        factoryTrim[0] = (double) (2620 / 1 << FS) * (pow(1.01, ((double) selfTest[0] - 1.0))); // FT[Xa] factory trim calculation
+        factoryTrim[1] = (double) (2620 / 1 << FS) * (pow(1.01, ((double) selfTest[1] - 1.0))); // FT[Ya] factory trim calculation
+        factoryTrim[2] = (double) (2620 / 1 << FS) * (pow(1.01, ((double) selfTest[2] - 1.0))); // FT[Za] factory trim calculation
+        factoryTrim[3] = (double) (2620 / 1 << FS) * (pow(1.01, ((double) selfTest[3] - 1.0))); // FT[Xg] factory trim calculation
+        factoryTrim[4] = (double) (2620 / 1 << FS) * (pow(1.01, ((double) selfTest[4] - 1.0))); // FT[Yg] factory trim calculation
+        factoryTrim[5] = (double) (2620 / 1 << FS) * (pow(1.01, ((double) selfTest[5] - 1.0))); // FT[Zg] factory trim calculation
 
         // Report results as a ratio of (STR - FT)/FT; the change from Factory Trim of the Self-Test Response
         // To get percent, must multiply by 100
@@ -727,7 +729,7 @@ public class MPU9250 {
     // device orientation -- which can be converted to yaw, pitch, and roll. Useful for stabilizing quadcopters, etc.
     // The performance of the orientation filter is at least as good as conventional Kalman-based filtering algorithms
     // but is much less computationally intensive---it can be performed on a 3.3 V Pro Mini operating at 8 MHz!
-    void MadgwickQuaternionUpdate(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz) {
+    void MadgwickQuaternionUpdate(double ax, double ay, double az, double gx, double gy, double gz, double mx, double my, double mz) {
         double q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];   // short name local variable for readability
         double norm;
         double hx, hy, _2bx, _2bz;
@@ -816,6 +818,29 @@ public class MPU9250 {
         q[2] = q3 * norm;
         q[3] = q4 * norm;
 
+        //call calculation for yaw,roll, and pitch
+
+
+    }
+
+    public void calculateYawRollPicth() {
+        // Define output variables from updated quaternion---these are Tait-Bryan angles, commonly used in aircraft orientation.
+        // In this coordinate system, the positive z-axis is down toward Earth.
+        // Yaw is the angle between Sensor x-axis and Earth magnetic North (or true North if corrected for local declination),
+        // looking down on the sensor positive yaw is counterclockwise.
+        // Pitch is angle between sensor x-axis and Earth ground plane, toward the Earth is positive, up toward the sky is negative.
+        // Roll is angle between sensor y-axis and Earth ground plane, y-axis up is positive roll.
+        // These arise from the definition of the homogeneous rotation matrix constructed from quaternions.
+        // Tait-Bryan angles as well as Euler angles are non-commutative; that is, to get the correct orientation the rotations must be
+        // applied in the correct order which for this configuration is yaw, pitch, and then roll.
+        // For more see http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles which has additional links.
+        yaw = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);
+        pitch = -asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
+        roll = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
+        pitch *= 180.0f / PI;
+        yaw *= 180.0f / PI;
+        yaw -= 13.8; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
+        roll *= 180.0f / PI;
     }
 
 

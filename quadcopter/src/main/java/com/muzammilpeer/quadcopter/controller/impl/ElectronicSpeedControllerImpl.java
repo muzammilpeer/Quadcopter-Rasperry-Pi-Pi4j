@@ -56,8 +56,8 @@ public class ElectronicSpeedControllerImpl implements ElectronicSpeedController 
     }
 
     public ElectronicSpeedControllerImpl(int bcmPin) {
+        super();
         this.bcmPinNumber = bcmPin;
-
         this.initializeESC();
     }
 
@@ -72,6 +72,16 @@ public class ElectronicSpeedControllerImpl implements ElectronicSpeedController 
         //I take my 50Hz * 20ms Period * 100 thing-a-ma-jigs Ratio = 100,000
         //To get my PWM Clock, I divide 19,200,000 / 100,000 = 192,
         //I need to divide 100,000 / 50Hz = 2000
+//        try {
+//            Class<Gpio> c = (Class<Gpio>) Class.forName("com.pi4j.wiringpi.Gpio");
+//            com.pi4j.wiringpi.Gpio sample = (com.pi4j.wiringpi.Gpio) c.newInstance();
+//        } catch (ClassNotFoundException e) {
+//            e.printStackTrace();
+//        } catch (InstantiationException e) {
+//            e.printStackTrace();
+//        } catch (IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
 
 
         Gpio.wiringPiSetupGpio();
@@ -109,8 +119,8 @@ public class ElectronicSpeedControllerImpl implements ElectronicSpeedController 
                 disArm();
             }
         }
-        currentESCSpeed = Math.round(ARM_ESC_SPEED); //50% for arming
-        updateSpeed(currentESCSpeed);
+//        currentESCSpeed = Math.round(ARM_ESC_SPEED); //50% for arming
+//        updateSpeed(currentESCSpeed);
     }
 
 
@@ -142,6 +152,7 @@ public class ElectronicSpeedControllerImpl implements ElectronicSpeedController 
     }
 
     public void updateSpeed(int speed) {
+
         Gpio.pwmWrite(this.bcmPinNumber, speed);
     }
 

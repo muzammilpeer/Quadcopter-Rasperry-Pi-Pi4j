@@ -1,34 +1,122 @@
 package com.muzammilpeer.quadcopter;
 
 
+import com.muzammilpeer.quadcopter.controller.ElectronicSpeedController;
+import com.muzammilpeer.quadcopter.controller.impl.ElectronicSpeedControllerImpl;
 import com.muzammilpeer.quadcopter.diozero.MPU6050;
 import com.muzammilpeer.quadcopter.diozero.Tools;
-import com.muzammilpeer.quadcopter.sensor.GY91;
+import com.pi4j.io.gpio.Pin;
+import com.pi4j.io.gpio.RaspiPin;
+import com.pi4j.util.CommandArgumentParser;
 
 import java.io.IOException;
 
 public class App {
 
     public static void main(String[] args) throws Exception {
+        Pin esc1Pin = CommandArgumentParser.getPin(
+                RaspiPin.class,    // pin provider class to obtain pin instance from
+                RaspiPin.GPIO_01,  // default pin if no pin argument found
+                args);             // argument array to search in
+        Pin esc2Pin = CommandArgumentParser.getPin(
+                RaspiPin.class,    // pin provider class to obtain pin instance from
+                RaspiPin.GPIO_02,  // default pin if no pin argument found
+                args);             // argument array to search in
+        Pin esc3Pin = CommandArgumentParser.getPin(
+                RaspiPin.class,    // pin provider class to obtain pin instance from
+                RaspiPin.GPIO_24,  // default pin if no pin argument found
+                args);             // argument array to search in
+        Pin esc4Pin = CommandArgumentParser.getPin(
+                RaspiPin.class,    // pin provider class to obtain pin instance from
+                RaspiPin.GPIO_23,  // default pin if no pin argument found
+                args);             // argument array to search in
+
+        int operatingFrequency = Math.round(1000.0f / 16); // 62.5 Hz
+        // gpio -readall to get the mapping of all pins check this command on terminal
+        ElectronicSpeedController controller1 = new ElectronicSpeedControllerImpl(18);
+        ElectronicSpeedController controller2 = new ElectronicSpeedControllerImpl(12);
+//        ElectronicSpeedController controller3 = new ElectronicSpeedControllerImpl(13);
+//        ElectronicSpeedController controller4 = new ElectronicSpeedControllerImpl(esc4Pin);
+//        System.out.print("Start calibration for ESC 1");
+//        System.in.read();
+//        controller1.calibrate();
+//        System.out.print("End calibration for ESC 1");
+//        controller1.disArm();
+//        System.out.print("Start calibration for ESC 1");
+//        System.in.read();
+//        controller2.calibrate();
+//        System.out.print("End calibration for ESC 1");
+//        controller2.disArm();
+//        controller3.calibrate();
+//        controller3.disArm();
+//        controller4.calibrate();
+//        controller4.disArm();
+
+        controller1.arm(true);
+        controller2.arm(true);
+//        Thread.sleep(2 * 1000);
+//        controller2.arm(true);
+//        Thread.sleep(2 * 1000);
+//        controller3.arm(true);
+//        Thread.sleep(5 * 1000);
+//        controller4.arm(true);
+        System.out.print("Call ESC are ARMED, Verify");
+        System.in.read();
+        Thread.sleep(2 * 1000);
+        for (int i = 0; i < 100; i++) {
+            controller1.changeSpeedTo(i + 1);
+            controller2.changeSpeedTo(i + 1);
+////            controller3.changeSpeedTo(i + 1);
+//            controller4.changeSpeedTo(i + 1);
+            Thread.sleep(operatingFrequency);
+        }
+
+//        Thread.sleep(2 * 1000);
+//        for (int i = 0; i < 100; i++) {
+//            controller1.changeSpeedTo(i + 1);
+//            Thread.sleep(operatingFrequency);
+//        }
+//        System.out.print("Call ESC are ARMED, Verify");
+//        System.in.read();
 //
-//        //Raspberry pi 3 Model B, GPIO_26 = BCM = 12 PIN, which has hardware enable PWM
-//        int operatingFrequency = Math.round(1000.0f / 16); // 62.5 Hz
-//        // gpio -readall to get the mapping of all pins check this command on terminal
+//        for (int i = 0; i < 100; i++) {
+//            controller2.changeSpeedTo(i + 1);
+//            Thread.sleep(operatingFrequency);
+//        }
 //
-//        ElectronicSpeedController controller = new ElectronicSpeedControllerImpl(12);
-//        //calibration then test flight
-//        controller.calibrate();
-//        controller.testFlight();
 //
-//        //or you have done calibration with your ESC then run a arm test for 5 seconds
-////        Thread.sleep(1 * 1000);
-////        controller.arm(true);
-////        Thread.sleep(5 * 1000);
-//        controller.disArm();
+//        for (int i = 0; i < 100; i++) {
+//            controller3.changeSpeedTo(i + 1);
+//            Thread.sleep(operatingFrequency);
+//        }
+//
+//
+//        for (int i = 0; i < 100; i++) {
+//            controller4.changeSpeedTo(i + 1);
+//            Thread.sleep(operatingFrequency);
+//        }
+
+
+//        Thread.sleep(5 * 1000);
+//
+//        for (int i = 100; i >= 0; i--) {
+//            controller1.changeSpeedTo(i);
+//            controller2.changeSpeedTo(i);
+//            Thread.sleep(operatingFrequency);
+//        }
+//        Thread.sleep(1 * 1000);
+//        controller.arm(true);
+        Thread.sleep(3 * 1000);
+        controller1.disArm();
+        controller2.disArm();
+//        controller3.disArm();
+//        controller4.disArm();
+        System.out.printf("Program end all ESC disarmed");
+
 
 //        testMPU6050();
-        GY91 gy91 = new GY91();
-        gy91.readDataFromSensors();
+//        GY91 gy91 = new GY91();
+//        gy91.readDataFromSensors();
     }
 
 

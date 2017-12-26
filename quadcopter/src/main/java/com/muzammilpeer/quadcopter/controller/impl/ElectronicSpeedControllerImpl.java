@@ -119,8 +119,8 @@ public class ElectronicSpeedControllerImpl implements ElectronicSpeedController 
                 disArm();
             }
         }
-//        currentESCSpeed = Math.round(ARM_ESC_SPEED); //50% for arming
-//        updateSpeed(currentESCSpeed);
+        currentESCSpeed = Math.round(ARM_ESC_SPEED); //50% for arming
+        updateSpeed(currentESCSpeed);
     }
 
 

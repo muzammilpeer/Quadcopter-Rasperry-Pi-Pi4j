@@ -18,11 +18,19 @@ public class BrushlessMotor {
     }
 
     public void setCurrentSpeed(int currentSpeed) {
+        isMoving = true;
+
+        if (currentSpeed > 240) {
+            currentSpeed = 240;
+        } else if (currentSpeed < 1) {
+            currentSpeed = 0;
+        }
+
+        isMoving = true;
         if (currentSpeed < 1) {
             isMoving = false;
-        } else {
-            isMoving = true;
         }
+
         this.currentSpeed = currentSpeed;
     }
 
@@ -34,4 +42,15 @@ public class BrushlessMotor {
     public boolean isMoving() {
         return isMoving;
     }
+
+    public BrushlessMotor increaseSpeed() {
+        setCurrentSpeed(getCurrentSpeed() + 1);
+        return this;
+    }
+
+    public BrushlessMotor decreaseSpeed() {
+        setCurrentSpeed(getCurrentSpeed() - 1);
+        return this;
+    }
+
 }

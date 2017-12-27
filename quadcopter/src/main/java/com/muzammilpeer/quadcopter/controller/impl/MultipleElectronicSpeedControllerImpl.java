@@ -6,7 +6,7 @@ import com.pi4j.wiringpi.Gpio;
 
 import java.util.List;
 
-public class MultipleElectronicSpeedControllerImpl implements MultipleElectronicSpeedController {
+public abstract class MultipleElectronicSpeedControllerImpl implements MultipleElectronicSpeedController {
 
 
     final float PWM_RANGE = 2000;
@@ -25,7 +25,7 @@ public class MultipleElectronicSpeedControllerImpl implements MultipleElectronic
 
 
     @Override
-    public void initializeAllESC(List<BrushlessMotor> brushlessMotorList) {
+    final public void initializeAllESC(List<BrushlessMotor> brushlessMotorList) {
         //For reference
         //pwmFrequency in Hz = 19.2e6 Hz / pwmClock / pwmRange.
         // Frequency  = 19200000 / 1920 / 200 == 50 hz freq
@@ -46,10 +46,11 @@ public class MultipleElectronicSpeedControllerImpl implements MultipleElectronic
         Gpio.pwmSetMode(Gpio.PWM_MODE_MS);
         Gpio.pwmSetClock(192); // 50Hz
         Gpio.pwmSetRange(2000); // 2000 ms
+
     }
 
     @Override
-    public void calibrate(List<BrushlessMotor> brushlessMotorList) {
+    final public void calibrate(List<BrushlessMotor> brushlessMotorList) {
         try {
             disArm(brushlessMotorList);
             System.out.println("Disconnect your power from All ESC");
@@ -68,7 +69,7 @@ public class MultipleElectronicSpeedControllerImpl implements MultipleElectronic
     }
 
     @Override
-    public void arm(List<BrushlessMotor> brushlessMotorList, boolean isCalibrated) {
+    final public void arm(List<BrushlessMotor> brushlessMotorList, boolean isCalibrated) {
         if (isCalibrated) {
             try {
                 disArm(brushlessMotorList);
@@ -80,7 +81,7 @@ public class MultipleElectronicSpeedControllerImpl implements MultipleElectronic
                 changeMotorSpeed(brushlessMotorList, Math.round(MIN_ESC_SPEED));
                 Thread.sleep(2 * TIME_INTERVAL);
             } catch (Exception e) {
-                disArm();
+                disArm(brushlessMotorList);
             }
         }
         //Arming speed  Speed 50% or some other value
@@ -88,7 +89,7 @@ public class MultipleElectronicSpeedControllerImpl implements MultipleElectronic
     }
 
     @Override
-    public void disArm(List<BrushlessMotor> brushlessMotorList) {
+    final public void disArm(List<BrushlessMotor> brushlessMotorList) {
         changeMotorSpeed(brushlessMotorList, Math.round(DISARM_ESC_SPEED));
     }
 
@@ -100,7 +101,7 @@ public class MultipleElectronicSpeedControllerImpl implements MultipleElectronic
     }
 
     @Override
-    public void changeMotorSpeed(List<BrushlessMotor> brushlessMotorList, int speed) {
+    final public void changeMotorSpeed(List<BrushlessMotor> brushlessMotorList, int speed) {
         for (BrushlessMotor motor : brushlessMotorList) {
             motor.setCurrentSpeed(Math.round((MIN_ESC_SPEED + calculateSpeed(speed))));
             Gpio.pwmWrite(motor.getPwmHardwareBCMPin(), motor.getCurrentSpeed());

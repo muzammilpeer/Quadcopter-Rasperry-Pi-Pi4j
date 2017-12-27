@@ -1,13 +1,13 @@
 <component name="libraryTable">
   <library name="Maven: com.diozero:diozero-core:0.11-SNAPSHOT">
     <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/com/diozero/diozero-core/0.11-SNAPSHOT/diozero-core-0.11-SNAPSHOT.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/diozero/diozero-core/0.11-SNAPSHOT/diozero-core-0.11-20171101.182416-16.jar!/" />
     </CLASSES>
     <JAVADOC>
-      <root url="jar://$MAVEN_REPOSITORY$/com/diozero/diozero-core/0.11-SNAPSHOT/diozero-core-0.11-SNAPSHOT-javadoc.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/diozero/diozero-core/0.11-SNAPSHOT/diozero-core-0.11-20171101.182416-16-javadoc.jar!/" />
     </JAVADOC>
     <SOURCES>
-      <root url="jar://$MAVEN_REPOSITORY$/com/diozero/diozero-core/0.11-SNAPSHOT/diozero-core-0.11-SNAPSHOT-sources.jar!/" />
+      <root url="jar://$MAVEN_REPOSITORY$/com/diozero/diozero-core/0.11-SNAPSHOT/diozero-core-0.11-20171101.182416-16-sources.jar!/" />
     </SOURCES>
   </library>
 </component>

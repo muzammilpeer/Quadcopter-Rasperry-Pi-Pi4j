@@ -1,14 +1,11 @@
 package com.muzammilpeer.quadcopter.controller;
 
-import com.muzammilpeer.quadcopter.controller.MultipleElectronicSpeedController;
 import com.muzammilpeer.quadcopter.controller.impl.MultipleElectronicSpeedControllerImpl;
 import com.muzammilpeer.quadcopter.enums.MotorEnum;
 import com.muzammilpeer.quadcopter.model.BrushlessMotor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 public class QuadCopterElectronicSpeedController extends MultipleElectronicSpeedControllerImpl {
 
@@ -66,7 +63,8 @@ public class QuadCopterElectronicSpeedController extends MultipleElectronicSpeed
     }
 
     public void decreaseMotorSpeed(MotorEnum motorEnum, int speed) {
-
+        BrushlessMotor motor = motors.get(motorEnum.ordinal()).decreaseSpeed();
+        super.changeMotorSpeed(Arrays.asList(motor), motor.getCurrentSpeed());
     }
 
 }

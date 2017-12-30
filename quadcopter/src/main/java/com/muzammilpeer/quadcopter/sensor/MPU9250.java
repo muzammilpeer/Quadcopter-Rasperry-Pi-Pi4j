@@ -187,7 +187,7 @@ public class MPU9250 {
     Mscale mscale = MFS_16BITS; // MFS_14BITS or MFS_16BITS, 14-bit or 16-bit magnetometer resolution
     //peer
     int Mmode = 0x06;        // Either 8 Hz 0x02) or 100 Hz (0x06) magnetometer data ODR
-    double aRes, gRes, mRes;      // scale resolutions per LSB for the sensors
+    float aRes, gRes, mRes;      // scale resolutions per LSB for the sensors
 
 
     // Pin definitions
@@ -196,40 +196,40 @@ public class MPU9250 {
     int accelCount[] = new int[3];  // Stores the 16-bit signed accelerometer sensor output
     int gyroCount[] = new int[3];   // Stores the 16-bit signed gyro sensor output
     int magCount[] = new int[3];    // Stores the 16-bit signed magnetometer sensor output
-    double magCalibration[] = {0, 0, 0};
-    double magbias[] = {0, 0, 0};  // Factory mag calibration and mag bias
-    double gyroBias[] = {0, 0, 0};
-    double accelBias[] = {0, 0, 0}; // Bias corrections for gyro and accelerometer
-    double ax, ay, az, gx, gy, gz, mx, my, mz; // variables to hold latest sensor data values
+    float magCalibration[] = {0, 0, 0};
+    float magbias[] = {0, 0, 0};  // Factory mag calibration and mag bias
+    float gyroBias[] = {0, 0, 0};
+    float accelBias[] = {0, 0, 0}; // Bias corrections for gyro and accelerometer
+    float ax, ay, az, gx, gy, gz, mx, my, mz; // variables to hold latest sensor data values
     int tempCount;   // Stores the real internal chip temperature in degrees Celsius
-    double temperature;
-    double SelfTest[] = new double[6];
+    float temperature;
+    float SelfTest[] = new float[6];
 
     int delt_t = 0; // used to control display output rate
     int count = 0;  // used to control display output rate
 
 
-    double Kp = 2.0f * 5.0f;// these are the free parameters in the Mahony filter and fusion scheme, Kp for proportional feedback, Ki for integral
-    double Ki = 0.0f;
+    float Kp = 2.0f * 5.0f;// these are the free parameters in the Mahony filter and fusion scheme, Kp for proportional feedback, Ki for integral
+    float Ki = 0.0f;
 
-    double pitch, yaw, roll;
-    double deltat = 0.0f;                             // integration interval for both filter schemes
+    float pitch, yaw, roll;
+    float deltat = 0.0f;                             // integration interval for both filter schemes
     int lastUpdate = 0, firstUpdate = 0, Now = 0;    // used to calculate integration interval                               // used to calculate integration interval
-    double q[] = {1.0f, 0.0f, 0.0f, 0.0f};           // vector to hold quaternion
-    double eInt[] = {0.0f, 0.0f, 0.0f};              // vector to hold integral error for Mahony method
+    float q[] = {1.0f, 0.0f, 0.0f, 0.0f};           // vector to hold quaternion
+    float eInt[] = {0.0f, 0.0f, 0.0f};              // vector to hold integral error for Mahony method
 
     int fdAK8963;
     int fdMPU9250;
-    double beta, zeta;
-    double PI, GyroMeasError, GyroMeasDrift;
+    float beta, zeta;
+    float PI, GyroMeasError, GyroMeasDrift;
 
     void MPU9250() {
         // parameters for 6 DoF sensor fusion calculations
         PI = 3.14159265358979323846f;
         GyroMeasError = PI * (60.0f / 180.0f);     // gyroscope measurement error in rads/s (start at 60 deg/s), then reduce after ~10 s to 3
-        beta = sqrt(3.0f / 4.0f) * GyroMeasError;  // compute beta
+        beta = (float) (sqrt(3.0f / 4.0f) * GyroMeasError);  // compute beta
         GyroMeasDrift = PI * (1.0f / 180.0f);      // gyroscope measurement drift in rad/s/s (start at 0.0 deg/s/s)
-        zeta = sqrt(3.0f / 4.0f) * GyroMeasDrift;  // compute zeta, the other free parameter in the Madgwick scheme usually set to a small or zero value
+        zeta = (float) (sqrt(3.0f / 4.0f) * GyroMeasDrift);  // compute zeta, the other free parameter in the Madgwick scheme usually set to a small or zero value
 
         fdAK8963 = wiringPiI2CSetup(AK8963_ADDRESS);
 
@@ -275,15 +275,15 @@ public class MPU9250 {
 
     //peer
 //    float getMres() {
-    double getMres() {
+    float getMres() {
         switch (mscale) {
             // Possible magnetometer scales (and their register bit settings) are:
             // 14 bit resolution (0) and 16 bit resolution (1)
             case MFS_14BITS:
-                mRes = 10.0 * 4219.0 / 8190.0; // Proper scale to return milliGauss
+                mRes = (float) (10.0 * 4219.0 / 8190.0); // Proper scale to return milliGauss
                 break;
             case MFS_16BITS:
-                mRes = 10.0 * 4219.0 / 32760.0; // Proper scale to return milliGauss
+                mRes = (float) (10.0 * 4219.0 / 32760.0); // Proper scale to return milliGauss
                 break;
         }
         return mRes;
@@ -291,22 +291,22 @@ public class MPU9250 {
 
     //peer
 //    float getGres() {
-    double getGres() {
+    float getGres() {
         switch (gscale) {
             // Possible gyro scales (and their register bit settings) are:
             // 250 DPS (00), 500 DPS (01), 1000 DPS (10), and 2000 DPS  (11).
             // Here's a bit of an algorith to calculate DPS/(ADC tick) based on that 2-bit value:
             case GFS_250DPS:
-                gRes = 250.0 / 32768.0;
+                gRes = (float) (250.0 / 32768.0);
                 break;
             case GFS_500DPS:
-                gRes = 500.0 / 32768.0;
+                gRes = (float) (500.0 / 32768.0);
                 break;
             case GFS_1000DPS:
-                gRes = 1000.0 / 32768.0;
+                gRes = (float) (1000.0 / 32768.0);
                 break;
             case GFS_2000DPS:
-                gRes = 2000.0 / 32768.0;
+                gRes = (float) (2000.0 / 32768.0);
                 break;
         }
         return gRes;
@@ -314,22 +314,22 @@ public class MPU9250 {
 
     //peer
 //    float getAres() {
-    double getAres() {
+    float getAres() {
         switch (ascale) {
             // Possible accelerometer scales (and their register bit settings) are:
             // 2 Gs (00), 4 Gs (01), 8 Gs (10), and 16 Gs  (11).
             // Here's a bit of an algorith to calculate DPS/(ADC tick) based on that 2-bit value:
             case AFS_2G:
-                aRes = 2.0 / 32768.0;
+                aRes = (float) (2.0 / 32768.0);
                 break;
             case AFS_4G:
-                aRes = 4.0 / 32768.0;
+                aRes = (float) (4.0 / 32768.0);
                 break;
             case AFS_8G:
-                aRes = 8.0 / 32768.0;
+                aRes = (float) (8.0 / 32768.0);
                 break;
             case AFS_16G:
-                aRes = 16.0 / 32768.0;
+                aRes = (float) (16.0 / 32768.0);
                 break;
         }
         return aRes;
@@ -383,8 +383,8 @@ public class MPU9250 {
 
     //peer
 //    float readTempInC() {
-    double readTempInC() {
-        return (double) readTempData() / 333.87 + 21.0;
+    float readTempInC() {
+        return (float) ((float) readTempData() / 333.87 + 21.0);
     }
 
 
@@ -394,7 +394,7 @@ public class MPU9250 {
         delay(100);
     }
 
-    void initAK8963(double destination[]) {
+    void initAK8963(float destination[]) {
         // First extract the factory calibration for each magnetometer axis
         int rawData[] = new int[3];  // x/y/z gyro calibration data stored here
         writeByte(AK8963_ADDRESS, AK8963_CNTL, 0x00); // Power down magnetometer
@@ -404,9 +404,9 @@ public class MPU9250 {
         //peer
 //        readBytes(AK8963_ADDRESS, AK8963_ASAX, 3, & rawData[0]);  // Read the x-, y-, and z-axis calibration values
         readBytes(AK8963_ADDRESS, AK8963_ASAX, 3, rawData);  // Read the x-, y-, and z-axis calibration values
-        destination[0] = (double) (rawData[0] - 128) / 256.0f + 1.0f;   // Return x-axis sensitivity adjustment values, etc.
-        destination[1] = (double) (rawData[1] - 128) / 256.0f + 1.0f;
-        destination[2] = (double) (rawData[2] - 128) / 256.0f + 1.0f;
+        destination[0] = (float) (rawData[0] - 128) / 256.0f + 1.0f;   // Return x-axis sensitivity adjustment values, etc.
+        destination[1] = (float) (rawData[1] - 128) / 256.0f + 1.0f;
+        destination[2] = (float) (rawData[2] - 128) / 256.0f + 1.0f;
         writeByte(AK8963_ADDRESS, AK8963_CNTL, 0x00); // Power down magnetometer
         delay(10);
         // Configure the magnetometer for continuous read and highest resolution
@@ -467,7 +467,7 @@ public class MPU9250 {
 
     // Function which accumulates gyro and accelerometer data after device initialization. It calculates the average
     // of the at-rest readings and then loads the resulting offsets into accelerometer and gyro bias registers.
-    void calibrateMPU9250(double dest1[], double dest2[]) {
+    void calibrateMPU9250(float dest1[], float dest2[]) {
         int data[] = new int[12]; // data array to hold accelerometer and gyro x, y, z, data
         int ii, packet_count, fifo_count;
         int gyro_bias[] = {0, 0, 0}, accel_bias[] = {0, 0, 0};
@@ -561,9 +561,9 @@ public class MPU9250 {
 		writeByte(MPU9250_ADDRESS, ZG_OFFSET_H, data[4]);
 		writeByte(MPU9250_ADDRESS, ZG_OFFSET_L, data[5]);
 		*/
-        dest1[0] = (double) gyro_bias[0] / (double) gyrosensitivity; // construct gyro bias in deg/s for later manual subtraction
-        dest1[1] = (double) gyro_bias[1] / (double) gyrosensitivity;
-        dest1[2] = (double) gyro_bias[2] / (double) gyrosensitivity;
+        dest1[0] = (float) gyro_bias[0] / (float) gyrosensitivity; // construct gyro bias in deg/s for later manual subtraction
+        dest1[1] = (float) gyro_bias[1] / (float) gyrosensitivity;
+        dest1[2] = (float) gyro_bias[2] / (float) gyrosensitivity;
 
         // Construct the accelerometer biases for push to the hardware accelerometer bias registers. These registers contain
         // factory trim values which must be added to the calculated accelerometer biases; on boot up these registers will hold
@@ -619,14 +619,14 @@ public class MPU9250 {
 		writeByte(MPU9250_ADDRESS, ZA_OFFSET_L, data[5]);
 		*/
         // Output scaled accelerometer biases for manual subtraction in the main program
-        dest2[0] = (double) accel_bias[0] / (double) accelsensitivity;
-        dest2[1] = (double) accel_bias[1] / (double) accelsensitivity;
-        dest2[2] = (double) accel_bias[2] / (double) accelsensitivity;
+        dest2[0] = (float) accel_bias[0] / (float) accelsensitivity;
+        dest2[1] = (float) accel_bias[1] / (float) accelsensitivity;
+        dest2[2] = (float) accel_bias[2] / (float) accelsensitivity;
     }
 
 
     // Accelerometer and gyroscope self test; check calibration wrt factory settings
-    void MPU9250SelfTest(double destination[]) // Should return percent deviation from factory trim values, +/- 14 or less deviation is a pass
+    void MPU9250SelfTest(float destination[]) // Should return percent deviation from factory trim values, +/- 14 or less deviation is a pass
     {
         int rawData[] = {0, 0, 0, 0, 0, 0};
         int selfTest[] = new int[6];
@@ -634,7 +634,7 @@ public class MPU9250 {
         int aAvg[] = new int[3];
         int aSTAvg[] = new int[3];
         int gSTAvg[] = new int[3];
-        double factoryTrim[] = new double[6];
+        float factoryTrim[] = new float[6];
         int FS = 0;
 
         writeByte(MPU9250_ADDRESS, SMPLRT_DIV, 0x00); // Set gyro sample rate to 1 kHz
@@ -706,18 +706,18 @@ public class MPU9250 {
         selfTest[5] = readByte(MPU9250_ADDRESS, SELF_TEST_Z_GYRO); // Z-axis gyro self-test results
 
         // Retrieve factory self-test value from self-test code reads
-        factoryTrim[0] = (double) (2620 / 1 << FS) * (pow(1.01, ((double) selfTest[0] - 1.0))); // FT[Xa] factory trim calculation
-        factoryTrim[1] = (double) (2620 / 1 << FS) * (pow(1.01, ((double) selfTest[1] - 1.0))); // FT[Ya] factory trim calculation
-        factoryTrim[2] = (double) (2620 / 1 << FS) * (pow(1.01, ((double) selfTest[2] - 1.0))); // FT[Za] factory trim calculation
-        factoryTrim[3] = (double) (2620 / 1 << FS) * (pow(1.01, ((double) selfTest[3] - 1.0))); // FT[Xg] factory trim calculation
-        factoryTrim[4] = (double) (2620 / 1 << FS) * (pow(1.01, ((double) selfTest[4] - 1.0))); // FT[Yg] factory trim calculation
-        factoryTrim[5] = (double) (2620 / 1 << FS) * (pow(1.01, ((double) selfTest[5] - 1.0))); // FT[Zg] factory trim calculation
+        factoryTrim[0] = (float) ((float) (2620 / 1 << FS) * (pow(1.01, ((float) selfTest[0] - 1.0)))); // FT[Xa] factory trim calculation
+        factoryTrim[1] = (float) ((float) (2620 / 1 << FS) * (pow(1.01, ((float) selfTest[1] - 1.0)))); // FT[Ya] factory trim calculation
+        factoryTrim[2] = (float) ((float) (2620 / 1 << FS) * (pow(1.01, ((float) selfTest[2] - 1.0)))); // FT[Za] factory trim calculation
+        factoryTrim[3] = (float) ((float) (2620 / 1 << FS) * (pow(1.01, ((float) selfTest[3] - 1.0)))); // FT[Xg] factory trim calculation
+        factoryTrim[4] = (float) ((float) (2620 / 1 << FS) * (pow(1.01, ((float) selfTest[4] - 1.0)))); // FT[Yg] factory trim calculation
+        factoryTrim[5] = (float) ((float) (2620 / 1 << FS) * (pow(1.01, ((float) selfTest[5] - 1.0)))); // FT[Zg] factory trim calculation
 
         // Report results as a ratio of (STR - FT)/FT; the change from Factory Trim of the Self-Test Response
         // To get percent, must multiply by 100
         for (int i = 0; i < 3; i++) {
-            destination[i] = 100.0 * ((double) (aSTAvg[i] - aAvg[i])) / factoryTrim[i]; // Report percent differences
-            destination[i + 3] = 100.0 * ((double) (gSTAvg[i] - gAvg[i])) / factoryTrim[i + 3]; // Report percent differences
+            destination[i] = (float) (100.0 * ((float) (aSTAvg[i] - aAvg[i])) / factoryTrim[i]); // Report percent differences
+            destination[i + 3] = (float) (100.0 * ((float) (gSTAvg[i] - gAvg[i])) / factoryTrim[i + 3]); // Report percent differences
         }
 
     }
@@ -729,39 +729,39 @@ public class MPU9250 {
     // device orientation -- which can be converted to yaw, pitch, and roll. Useful for stabilizing quadcopters, etc.
     // The performance of the orientation filter is at least as good as conventional Kalman-based filtering algorithms
     // but is much less computationally intensive---it can be performed on a 3.3 V Pro Mini operating at 8 MHz!
-    void MadgwickQuaternionUpdate(double ax, double ay, double az, double gx, double gy, double gz, double mx, double my, double mz) {
-        double q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];   // short name local variable for readability
-        double norm;
-        double hx, hy, _2bx, _2bz;
-        double s1, s2, s3, s4;
-        double qDot1, qDot2, qDot3, qDot4;
+    void MadgwickQuaternionUpdate(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz) {
+        float q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];   // short name local variable for readability
+        float norm;
+        float hx, hy, _2bx, _2bz;
+        float s1, s2, s3, s4;
+        float qDot1, qDot2, qDot3, qDot4;
 
         // Auxiliary variables to avoid repeated arithmetic
-        double _2q1mx;
-        double _2q1my;
-        double _2q1mz;
-        double _2q2mx;
-        double _4bx;
-        double _4bz;
-        double _2q1 = 2.0f * q1;
-        double _2q2 = 2.0f * q2;
-        double _2q3 = 2.0f * q3;
-        double _2q4 = 2.0f * q4;
-        double _2q1q3 = 2.0f * q1 * q3;
-        double _2q3q4 = 2.0f * q3 * q4;
-        double q1q1 = q1 * q1;
-        double q1q2 = q1 * q2;
-        double q1q3 = q1 * q3;
-        double q1q4 = q1 * q4;
-        double q2q2 = q2 * q2;
-        double q2q3 = q2 * q3;
-        double q2q4 = q2 * q4;
-        double q3q3 = q3 * q3;
-        double q3q4 = q3 * q4;
-        double q4q4 = q4 * q4;
+        float _2q1mx;
+        float _2q1my;
+        float _2q1mz;
+        float _2q2mx;
+        float _4bx;
+        float _4bz;
+        float _2q1 = 2.0f * q1;
+        float _2q2 = 2.0f * q2;
+        float _2q3 = 2.0f * q3;
+        float _2q4 = 2.0f * q4;
+        float _2q1q3 = 2.0f * q1 * q3;
+        float _2q3q4 = 2.0f * q3 * q4;
+        float q1q1 = q1 * q1;
+        float q1q2 = q1 * q2;
+        float q1q3 = q1 * q3;
+        float q1q4 = q1 * q4;
+        float q2q2 = q2 * q2;
+        float q2q3 = q2 * q3;
+        float q2q4 = q2 * q4;
+        float q3q3 = q3 * q3;
+        float q3q4 = q3 * q4;
+        float q4q4 = q4 * q4;
 
         // Normalise accelerometer measurement
-        norm = sqrt(ax * ax + ay * ay + az * az);
+        norm = (float) sqrt(ax * ax + ay * ay + az * az);
         if (norm == 0.0f) return; // handle NaN
         norm = 1.0f / norm;
         ax *= norm;
@@ -769,7 +769,7 @@ public class MPU9250 {
         az *= norm;
 
         // Normalise magnetometer measurement
-        norm = sqrt(mx * mx + my * my + mz * mz);
+        norm = (float) sqrt(mx * mx + my * my + mz * mz);
         if (norm == 0.0f) return; // handle NaN
         norm = 1.0f / norm;
         mx *= norm;
@@ -783,7 +783,7 @@ public class MPU9250 {
         _2q2mx = 2.0f * q2 * mx;
         hx = mx * q1q1 - _2q1my * q4 + _2q1mz * q3 + mx * q2q2 + _2q2 * my * q3 + _2q2 * mz * q4 - mx * q3q3 - mx * q4q4;
         hy = _2q1mx * q4 + my * q1q1 - _2q1mz * q2 + _2q2mx * q3 - my * q2q2 + my * q3q3 + _2q3 * mz * q4 - my * q4q4;
-        _2bx = sqrt(hx * hx + hy * hy);
+        _2bx = (float) sqrt(hx * hx + hy * hy);
         _2bz = -_2q1mx * q3 + _2q1my * q2 + mz * q1q1 + _2q2mx * q4 - mz * q2q2 + _2q3 * my * q4 - mz * q3q3 + mz * q4q4;
         _4bx = 2.0f * _2bx;
         _4bz = 2.0f * _2bz;
@@ -793,7 +793,7 @@ public class MPU9250 {
         s2 = _2q4 * (2.0f * q2q4 - _2q1q3 - ax) + _2q1 * (2.0f * q1q2 + _2q3q4 - ay) - 4.0f * q2 * (1.0f - 2.0f * q2q2 - 2.0f * q3q3 - az) + _2bz * q4 * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + (_2bx * q3 + _2bz * q1) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + (_2bx * q4 - _4bz * q2) * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - mz);
         s3 = -_2q1 * (2.0f * q2q4 - _2q1q3 - ax) + _2q4 * (2.0f * q1q2 + _2q3q4 - ay) - 4.0f * q3 * (1.0f - 2.0f * q2q2 - 2.0f * q3q3 - az) + (-_4bx * q3 - _2bz * q1) * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + (_2bx * q2 + _2bz * q4) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + (_2bx * q1 - _4bz * q3) * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - mz);
         s4 = _2q2 * (2.0f * q2q4 - _2q1q3 - ax) + _2q3 * (2.0f * q1q2 + _2q3q4 - ay) + (-_4bx * q4 + _2bz * q2) * (_2bx * (0.5f - q3q3 - q4q4) + _2bz * (q2q4 - q1q3) - mx) + (-_2bx * q1 + _2bz * q3) * (_2bx * (q2q3 - q1q4) + _2bz * (q1q2 + q3q4) - my) + _2bx * q2 * (_2bx * (q1q3 + q2q4) + _2bz * (0.5f - q2q2 - q3q3) - mz);
-        norm = sqrt(s1 * s1 + s2 * s2 + s3 * s3 + s4 * s4);    // normalise step magnitude
+        norm = (float) sqrt(s1 * s1 + s2 * s2 + s3 * s3 + s4 * s4);    // normalise step magnitude
         norm = 1.0f / norm;
         s1 *= norm;
         s2 *= norm;
@@ -811,7 +811,7 @@ public class MPU9250 {
         q2 += qDot2 * deltat;
         q3 += qDot3 * deltat;
         q4 += qDot4 * deltat;
-        norm = sqrt(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);    // normalise quaternion
+        norm = (float) sqrt(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);    // normalise quaternion
         norm = 1.0f / norm;
         q[0] = q1 * norm;
         q[1] = q2 * norm;
@@ -834,9 +834,9 @@ public class MPU9250 {
         // Tait-Bryan angles as well as Euler angles are non-commutative; that is, to get the correct orientation the rotations must be
         // applied in the correct order which for this configuration is yaw, pitch, and then roll.
         // For more see http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles which has additional links.
-        yaw = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);
-        pitch = -asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
-        roll = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
+        yaw = (float) atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);
+        pitch = (float) -asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
+        roll = (float) atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
         pitch *= 180.0f / PI;
         yaw *= 180.0f / PI;
         yaw -= 13.8; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
@@ -846,28 +846,28 @@ public class MPU9250 {
 
     // Similar to Madgwick scheme but uses proportional and integral filtering on the error between estimated reference vectors and
     // measured ones.
-    void MahonyQuaternionUpdate(double ax, double ay, double az, double gx, double gy, double gz, double mx, double my, double mz) {
-        double q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];   // short name local variable for readability
-        double norm;
-        double hx, hy, bx, bz;
-        double vx, vy, vz, wx, wy, wz;
-        double ex, ey, ez;
-        double pa, pb, pc;
+    void MahonyQuaternionUpdate(float ax, float ay, float az, float gx, float gy, float gz, float mx, float my, float mz) {
+        float q1 = q[0], q2 = q[1], q3 = q[2], q4 = q[3];   // short name local variable for readability
+        float norm;
+        float hx, hy, bx, bz;
+        float vx, vy, vz, wx, wy, wz;
+        float ex, ey, ez;
+        float pa, pb, pc;
 
         // Auxiliary variables to avoid repeated arithmetic
-        double q1q1 = q1 * q1;
-        double q1q2 = q1 * q2;
-        double q1q3 = q1 * q3;
-        double q1q4 = q1 * q4;
-        double q2q2 = q2 * q2;
-        double q2q3 = q2 * q3;
-        double q2q4 = q2 * q4;
-        double q3q3 = q3 * q3;
-        double q3q4 = q3 * q4;
-        double q4q4 = q4 * q4;
+        float q1q1 = q1 * q1;
+        float q1q2 = q1 * q2;
+        float q1q3 = q1 * q3;
+        float q1q4 = q1 * q4;
+        float q2q2 = q2 * q2;
+        float q2q3 = q2 * q3;
+        float q2q4 = q2 * q4;
+        float q3q3 = q3 * q3;
+        float q3q4 = q3 * q4;
+        float q4q4 = q4 * q4;
 
         // Normalise accelerometer measurement
-        norm = sqrt(ax * ax + ay * ay + az * az);
+        norm = (float) sqrt(ax * ax + ay * ay + az * az);
         if (norm == 0.0f) return; // handle NaN
         norm = 1.0f / norm;        // use reciprocal for division
         ax *= norm;
@@ -875,7 +875,7 @@ public class MPU9250 {
         az *= norm;
 
         // Normalise magnetometer measurement
-        norm = sqrt(mx * mx + my * my + mz * mz);
+        norm = (float) sqrt(mx * mx + my * my + mz * mz);
         if (norm == 0.0f) return; // handle NaN
         norm = 1.0f / norm;        // use reciprocal for division
         mx *= norm;
@@ -885,7 +885,7 @@ public class MPU9250 {
         // Reference direction of Earth's magnetic field
         hx = 2.0f * mx * (0.5f - q3q3 - q4q4) + 2.0f * my * (q2q3 - q1q4) + 2.0f * mz * (q2q4 + q1q3);
         hy = 2.0f * mx * (q2q3 + q1q4) + 2.0f * my * (0.5f - q2q2 - q4q4) + 2.0f * mz * (q3q4 - q1q2);
-        bx = sqrt((hx * hx) + (hy * hy));
+        bx = (float) sqrt((hx * hx) + (hy * hy));
         bz = 2.0f * mx * (q2q4 - q1q3) + 2.0f * my * (q3q4 + q1q2) + 2.0f * mz * (0.5f - q2q2 - q3q3);
 
         // Estimated direction of gravity and magnetic field
@@ -925,7 +925,7 @@ public class MPU9250 {
         q4 = pc + (q1 * gz + pa * gy - pb * gx) * (0.5f * deltat);
 
         // Normalise quaternion
-        norm = sqrt(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);
+        norm = (float) sqrt(q1 * q1 + q2 * q2 + q3 * q3 + q4 * q4);
         norm = 1.0f / norm;
         q[0] = q1 * norm;
         q[1] = q2 * norm;

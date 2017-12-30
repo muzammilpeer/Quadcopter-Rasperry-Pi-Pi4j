@@ -19,6 +19,8 @@
 package com.muzammilpeer.quadcopter.diozero;
 
 
+import static java.lang.Math.PI;
+
 /**
  * <b>Implementation of the MPU6050 component.</b>
  * <p>
@@ -149,17 +151,7 @@ public class MPU6050 extends I2CComponent {
     /**
      * Coefficient to convert an angle value from radians to degrees.
      */
-    public static final double RADIAN_TO_DEGREE = 180. / Math.PI;
-
-    /**
-     * It is impossible to calculate an angle for the z axis from the accelerometer.
-     */
-    private static final double ACCEL_Z_ANGLE = 0;
-
-    /* -----------------------------------------------------------------------
-     *                          REGISTERS ADDRESSES
-     * -----------------------------------------------------------------------*/
-
+    public static final double RADIAN_TO_DEGREE = 180. / PI;
     /**
      * <b>[datasheet 2 - p.11]</b> Sample Rate Divider
      * <p>This register specifies the divider from the gyroscope output rate used to generate
@@ -167,40 +159,38 @@ public class MPU6050 extends I2CComponent {
      */
     public static final int MPU6050_REG_ADDR_SMPRT_DIV = 0x19; // 25
 
+    /* -----------------------------------------------------------------------
+     *                          REGISTERS ADDRESSES
+     * -----------------------------------------------------------------------*/
     /**
      * <b>[datasheet 2 - p.13]</b> Configuration
      * <p>This register configures the external Frame Synchronization (FSYNC) pin sampling and
      * the Digital Low Pass Filter (DLPF) setting for both the gyroscopes and accelerometers.</p>
      */
     public static final int MPU6050_REG_ADDR_CONFIG = 0x1A; // 26
-
     /**
      * <b>[datasheet 2 - p.14]</b> Gyroscope Configuration
      * <p>This register is used to trigger gyroscope self-test and configure the gyroscopes’ full
      * scale range</p>
      */
     public static final int MPU6050_REG_ADDR_GYRO_CONFIG = 0x1B; // 27
-
     /**
      * <b>[datasheet 2 - p.15]</b> Accelerometer Configuration
      * <p>This register is used to trigger accelerometer self test and configure the accelerometer
      * full scale range. This register also configures the Digital High Pass Filter (DHPF).</p>
      */
     public static final int MPU6050_REG_ADDR_ACCEL_CONFIG = 0x1C; // 28
-
     /**
      * <b>[datasheet 2 - p.27]</b> Interrupt Enable
      * <p>This register enables interrupt generation by interrupt sources.</p>
      */
     public static final int MPU6050_REG_ADDR_INT_ENABLE = 0x1A; // 56
-
     /**
      * <b>[datasheet 2 - p.40]</b> Power Management 1
      * <p>This register allows the user to configure the power mode and clock source. It also provides
      * a bit for resetting the entire device, and a bit for disabling the temperature sensor.</p>
      */
     public static final int MPU6050_REG_ADDR_PWR_MGMT_1 = 0x6B; // 107
-
     /**
      * <b>[datasheet 2 - p.42]</b> Power Management 2
      * <p>This register allows the user to configure the frequency of wake-ups in Accelerometer Only Low
@@ -208,7 +198,6 @@ public class MPU6050 extends I2CComponent {
      * gyroscope into standby mode.</p>
      */
     public static final int MPU6050_REG_ADDR_PWR_MGMT_2 = 0x6C; // 108
-
     /**
      * <b>[datasheet 2 - p.29]</b> Accelerometer Measurements
      * <p>These registers store the most recent accelerometer measurements.</p>
@@ -220,7 +209,6 @@ public class MPU6050 extends I2CComponent {
      * @see #MPU6050_REG_ADDR_ACCEL_ZOUT_L
      */
     public static final int MPU6050_REG_ADDR_ACCEL_XOUT_H = 0x3B; // 59
-
     /**
      * <b>[datasheet 2 - p.29]</b> Accelerometer Measurements
      * <p>These registers store the most recent accelerometer measurements.</p>
@@ -232,7 +220,6 @@ public class MPU6050 extends I2CComponent {
      * @see #MPU6050_REG_ADDR_ACCEL_ZOUT_L
      */
     public static final int MPU6050_REG_ADDR_ACCEL_XOUT_L = 0x3C; // 60
-
     /**
      * <b>[datasheet 2 - p.29]</b> Accelerometer Measurements
      * <p>These registers store the most recent accelerometer measurements.</p>
@@ -244,7 +231,6 @@ public class MPU6050 extends I2CComponent {
      * @see #MPU6050_REG_ADDR_ACCEL_ZOUT_L
      */
     public static final int MPU6050_REG_ADDR_ACCEL_YOUT_H = 0x3D; // 61
-
     /**
      * <b>[datasheet 2 - p.29]</b> Accelerometer Measurements
      * <p>These registers store the most recent accelerometer measurements.</p>
@@ -256,7 +242,6 @@ public class MPU6050 extends I2CComponent {
      * @see #MPU6050_REG_ADDR_ACCEL_ZOUT_L
      */
     public static final int MPU6050_REG_ADDR_ACCEL_YOUT_L = 0x3E; // 62
-
     /**
      * <b>[datasheet 2 - p.29]</b> Accelerometer Measurements
      * <p>These registers store the most recent accelerometer measurements.</p>
@@ -268,7 +253,6 @@ public class MPU6050 extends I2CComponent {
      * @see #MPU6050_REG_ADDR_ACCEL_ZOUT_L
      */
     public static final int MPU6050_REG_ADDR_ACCEL_ZOUT_H = 0x3F; // 63
-
     /**
      * <b>[datasheet 2 - p.29]</b> Accelerometer Measurements
      * <p>These registers store the most recent accelerometer measurements.</p>
@@ -280,7 +264,6 @@ public class MPU6050 extends I2CComponent {
      * @see #MPU6050_REG_ADDR_ACCEL_ZOUT_H
      */
     public static final int MPU6050_REG_ADDR_ACCEL_ZOUT_L = 0x40; // 64
-
     /**
      * <b>[datasheet 2 - p.30]</b> Temperature Measurement
      * <p>These registers store the most recent temperature sensor measurement.</p>
@@ -288,7 +271,6 @@ public class MPU6050 extends I2CComponent {
      * @see #MPU6050_REG_ADDR_TEMP_OUT_L
      */
     public static final int MPU6050_REG_ADDR_TEMP_OUT_H = 0x41; // 65
-
     /**
      * <b>[datasheet 2 - p.30]</b> Temperature Measurement
      * <p>These registers store the most recent temperature sensor measurement.</p>
@@ -296,7 +278,6 @@ public class MPU6050 extends I2CComponent {
      * @see #MPU6050_REG_ADDR_TEMP_OUT_H
      */
     public static final int MPU6050_REG_ADDR_TEMP_OUT_L = 0x42; // 66
-
     /**
      * <b>[datasheet 2 - p.31]</b> Gyroscope Measurements
      * <p>These registers store the most recent gyroscope measurements.</p>
@@ -308,7 +289,6 @@ public class MPU6050 extends I2CComponent {
      * @see #MPU6050_REG_ADDR_GYRO_ZOUT_L
      */
     public static final int MPU6050_REG_ADDR_GYRO_XOUT_H = 0x43; // 67
-
     /**
      * <b>[datasheet 2 - p.31]</b> Gyroscope Measurements
      * <p>These registers store the most recent gyroscope measurements.</p>
@@ -320,7 +300,6 @@ public class MPU6050 extends I2CComponent {
      * @see #MPU6050_REG_ADDR_GYRO_ZOUT_L
      */
     public static final int MPU6050_REG_ADDR_GYRO_XOUT_L = 0x44; // 68
-
     /**
      * <b>[datasheet 2 - p.31]</b> Gyroscope Measurements
      * <p>These registers store the most recent gyroscope measurements.</p>
@@ -332,7 +311,6 @@ public class MPU6050 extends I2CComponent {
      * @see #MPU6050_REG_ADDR_GYRO_ZOUT_L
      */
     public static final int MPU6050_REG_ADDR_GYRO_YOUT_H = 0x45; // 69
-
     /**
      * <b>[datasheet 2 - p.31]</b> Gyroscope Measurements
      * <p>These registers store the most recent gyroscope measurements.</p>
@@ -344,7 +322,6 @@ public class MPU6050 extends I2CComponent {
      * @see #MPU6050_REG_ADDR_GYRO_ZOUT_L
      */
     public static final int MPU6050_REG_ADDR_GYRO_YOUT_L = 0x46; // 70
-
     /**
      * <b>[datasheet 2 - p.31]</b> Gyroscope Measurements
      * <p>These registers store the most recent gyroscope measurements.</p>
@@ -356,7 +333,6 @@ public class MPU6050 extends I2CComponent {
      * @see #MPU6050_REG_ADDR_GYRO_ZOUT_L
      */
     public static final int MPU6050_REG_ADDR_GYRO_ZOUT_H = 0x47; // 71
-
     /**
      * <b>[datasheet 2 - p.31]</b> Gyroscope Measurements
      * <p>These registers store the most recent gyroscope measurements.</p>
@@ -368,154 +344,139 @@ public class MPU6050 extends I2CComponent {
      * @see #MPU6050_REG_ADDR_GYRO_ZOUT_H
      */
     public static final int MPU6050_REG_ADDR_GYRO_ZOUT_L = 0x48; // 72
+    /**
+     * It is impossible to calculate an angle for the z axis from the accelerometer.
+     */
+    private static final double ACCEL_Z_ANGLE = 0;
 
     /* -----------------------------------------------------------------------
      *                             VARIABLES
      * -----------------------------------------------------------------------*/
-
     /**
      * Value used for the DLPF config.
      */
     private int dlpfCfg;
-
     /**
      * Value used for the sample rate divider.
      */
     private int smplrtDiv;
 
+    // ACCELEROMETER
     /**
      * Sensisitivty of the measures from the accelerometer.
      * Used to convert accelerometer values.
      */
     private double accelLSBSensitivity;
-
     /**
      * Sensitivity of the measures from the gyroscope.
      * Used to convert gyroscope values to degrees/sec.
      */
     private double gyroLSBSensitivity;
-
     private Thread updatingThread = null;
     private boolean updatingThreadStopped = true;
     private long lastUpdateTime = 0;
-
-    // ACCELEROMETER
-
     /**
      * Last acceleration value, in g, retrieved from the accelerometer, for the x axis.
      * <p><i>(using the updating thread)</i></p>
      */
     private double accelAccelerationX = 0.;
 
+    // GYROSCOPE
     /**
      * Last acceleration value, in g, retrieved from the accelerometer, for the y axis.
      * <p><i>(using the updating thread)</i></p>
      */
     private double accelAccelerationY = 0.;
-
     /**
      * Last acceleration value, in g, retrieved from the accelerometer, for the z axis.
      * <p><i>(using the updating thread)</i></p>
      */
     private double accelAccelerationZ = 0.;
-
     /**
      * Last angle value, in °, retrieved from the accelerometer, for the x axis.
      * <p><i>(using the updating thread)</i></p>
      */
     private double accelAngleX = 0.;
-
     /**
      * Last angle value, in °, retrieved from the accelerometer, for the y axis.
      * <p><i>(using the updating thread)</i></p>
      */
     private double accelAngleY = 0.;
-
     /**
      * Last angle value, in °, retrieved from the accelerometer, for the z axis.
      * <p><i>(using the updating thread)</i></p>
      */
     private double accelAngleZ = 0.;
-
-    // GYROSCOPE
-
     /**
      * Last angular speed value, in °/sec, retrieved from the gyroscope, for the x axis.
      * <p><i>(using the updating thread)</i></p>
      */
     private double gyroAngularSpeedX = 0.;
-
     /**
      * Last angular speed value, in °/sec, retrieved from the gyroscope, for the y axis.
      * <p><i>(using the updating thread)</i></p>
      */
     private double gyroAngularSpeedY = 0.;
-
     /**
      * Last angular speed value, in °/sec, retrieved from the gyroscope, for the z axis.
      * <p><i>(using the updating thread)</i></p>
      */
     private double gyroAngularSpeedZ = 0.;
-
     /**
      * Last angle value, in °, calculated from the gyroscope, for the x axis.
      * <p><i>(using the updating thread)</i></p>
      */
     private double gyroAngleX = 0.;
 
+    // FILTERED
     /**
      * Last angle value, in °, calculated from the gyroscope, for the y axis.
      * <p><i>(using the updating thread)</i></p>
      */
     private double gyroAngleY = 0.;
-
     /**
      * Last angle value, in °, calculated from the gyroscope, for the z axis.
      * <p><i>(using the updating thread)</i></p>
      */
     private double gyroAngleZ = 0.;
-
     /**
      * Calculated offset for the angular speed from the gyroscope, for the x axis.
      */
     private double gyroAngularSpeedOffsetX = 0.;
 
+    /* -----------------------------------------------------------------------
+     *                             CONSTRUCTORS
+     * -----------------------------------------------------------------------*/
     /**
      * Calculated offset for the angular speed from the gyroscope, for the y axis.
      */
     private double gyroAngularSpeedOffsetY = 0.;
-
     /**
      * Calculated offset for the angular speed from the gyroscope, for the z axis.
      */
     private double gyroAngularSpeedOffsetZ = 0.;
 
-    // FILTERED
-
+    /* -----------------------------------------------------------------------
+     *                             METHODS
+     * -----------------------------------------------------------------------*/
     /**
      * Last angle value, in °, calculated from the accelerometer and the gyroscope,
      * for the x axis.
      * <p><i>(using the updating thread)</i></p>
      */
     private double filteredAngleX = 0.;
-
     /**
      * Last angle value, in °, calculated from the accelerometer and the gyroscope,
      * for the y axis.
      * <p><i>(using the updating thread)</i></p>
      */
     private double filteredAngleY = 0.;
-
     /**
      * Last angle value, in °, calculated from the accelerometer and the gyroscope,
      * for the z axis.
      * <p><i>(using the updating thread)</i></p>
      */
     private double filteredAngleZ = 0.;
-
-    /* -----------------------------------------------------------------------
-     *                             CONSTRUCTORS
-     * -----------------------------------------------------------------------*/
 
     /**
      * Constructor for a new MPU6050 using the default i2c address
@@ -555,8 +516,8 @@ public class MPU6050 extends I2CComponent {
         // SMPLRT_DIV set the rate to the default value : Sample Rate = Gyroscope Rate.
         updateRegisterValue(MPU6050_REG_ADDR_SMPRT_DIV, smplrtDiv);
 
-        // 3. This register configures the external Frame Synchronization (FSYNC) 
-        // pin sampling and the Digital Low Pass Filter (DLPF) setting for both 
+        // 3. This register configures the external Frame Synchronization (FSYNC)
+        // pin sampling and the Digital Low Pass Filter (DLPF) setting for both
         // the gyroscopes and accelerometers.
         setDLPFConfig(dlpfCfg);
 
@@ -580,9 +541,47 @@ public class MPU6050 extends I2CComponent {
         calibrateSensors();
     }
 
-    /* -----------------------------------------------------------------------
-     *                             METHODS
-     * -----------------------------------------------------------------------*/
+    /**
+     * Returns the String representation of an angle, in the "x.xxxx°" format.
+     *
+     * @param angle the angle to convert.
+     * @return the String representation of an angle, in the "x.xxxx°" format.
+     */
+    public static String angleToString(double angle) {
+        return String.format("%.4f", angle) + "°";
+    }
+
+    /**
+     * Returns the String representation of an acceleration value, in the "x.xxxxxxg" format.
+     *
+     * @param accel the acceleration to convert.
+     * @return the String representation of an acceleration value, in the "x.xxxxxxg" format.
+     */
+    public static String accelToString(double accel) {
+        return String.format("%.6f", accel) + "g";
+    }
+
+    /**
+     * Returns the String representation of an angular speed value, in the "x.xxxx°/s" format.
+     *
+     * @param angularSpeed the angular speed to convert.
+     * @return the String representation of an angular speed value, in the "x.xxxx°/s" format.
+     */
+    public static String angularSpeedToString(double angularSpeed) {
+        return String.format("%.4f", angularSpeed) + "°/s";
+    }
+
+    /**
+     * Returns a String representation of a triplet of values, in the "x: X\t y: Y\t z: Z" format.
+     *
+     * @param x the first value of the triplet.
+     * @param y the second value of the triplet.
+     * @param z the thirs value of the triplet.
+     * @return a String representation of a triplet of values, in the "x: X\t y: Y\t z: Z" format.
+     */
+    public static String xyzValuesToString(String x, String y, String z) {
+        return "pitch: " + x + "\troll: " + y + "\tyaw: " + z;
+    }
 
     /**
      * Returns the Sample Rate of the MPU6050.
@@ -687,6 +686,10 @@ public class MPU6050 extends I2CComponent {
         Tools.log("Calibration ended", Tools.Color.ANSI_RED);
     }
 
+    /* -----------------------------------------------------------------------
+     *                              UTILS
+     * -----------------------------------------------------------------------*/
+
     /**
      * Starts the thread responsible to update MPU6050 values in background.
      */
@@ -753,7 +756,8 @@ public class MPU6050 extends I2CComponent {
         gyroAngleZ += deltaGyroAngleZ;
 
         // Complementary Filter
-        double alpha = 0.96;
+//        double alpha = 0.96;
+        double alpha = 0.98;
         filteredAngleX = alpha * (filteredAngleX + deltaGyroAngleX) + (1. - alpha) * accelAngleX;
         filteredAngleY = alpha * (filteredAngleY + deltaGyroAngleY) + (1. - alpha) * accelAngleY;
         filteredAngleZ = filteredAngleZ + deltaGyroAngleZ;
@@ -834,10 +838,6 @@ public class MPU6050 extends I2CComponent {
             return new double[]{-1., -1., -1.};
         return new double[]{filteredAngleX, filteredAngleY, filteredAngleZ};
     }
-
-    /* -----------------------------------------------------------------------
-     *                              UTILS
-     * -----------------------------------------------------------------------*/
 
     /**
      * This method updates the value of a specific register with a specific value.
@@ -949,45 +949,5 @@ public class MPU6050 extends I2CComponent {
         return ACCEL_Z_ANGLE;
     }
 
-    /**
-     * Returns the String representation of an angle, in the "x.xxxx°" format.
-     *
-     * @param angle the angle to convert.
-     * @return the String representation of an angle, in the "x.xxxx°" format.
-     */
-    public static String angleToString(double angle) {
-        return String.format("%.4f", angle) + "°";
-    }
 
-    /**
-     * Returns the String representation of an acceleration value, in the "x.xxxxxxg" format.
-     *
-     * @param accel the acceleration to convert.
-     * @return the String representation of an acceleration value, in the "x.xxxxxxg" format.
-     */
-    public static String accelToString(double accel) {
-        return String.format("%.6f", accel) + "g";
-    }
-
-    /**
-     * Returns the String representation of an angular speed value, in the "x.xxxx°/s" format.
-     *
-     * @param angularSpeed the angular speed to convert.
-     * @return the String representation of an angular speed value, in the "x.xxxx°/s" format.
-     */
-    public static String angularSpeedToString(double angularSpeed) {
-        return String.format("%.4f", angularSpeed) + "°/s";
-    }
-
-    /**
-     * Returns a String representation of a triplet of values, in the "x: X\t y: Y\t z: Z" format.
-     *
-     * @param x the first value of the triplet.
-     * @param y the second value of the triplet.
-     * @param z the thirs value of the triplet.
-     * @return a String representation of a triplet of values, in the "x: X\t y: Y\t z: Z" format.
-     */
-    public static String xyzValuesToString(String x, String y, String z) {
-        return "x: " + x + "\ty: " + y + "\tz: " + z;
-    }
 }

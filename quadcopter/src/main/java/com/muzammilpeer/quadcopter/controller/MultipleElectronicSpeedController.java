@@ -6,14 +6,24 @@ import java.util.List;
 
 public interface MultipleElectronicSpeedController {
 
-    void initializeAllESC(List<BrushlessMotor> brushlessMotorList);
+    List<BrushlessMotor> initializeAllESC(List<BrushlessMotor> brushlessMotorList);
 
-    void calibrate(List<BrushlessMotor> brushlessMotorList);
+    BrushlessMotor initializeESC(BrushlessMotor brushlessMotor);
 
-    void arm(List<BrushlessMotor> brushlessMotorList, boolean isCalibrated);
+    List<BrushlessMotor> calibrate(List<BrushlessMotor> brushlessMotorList);
 
-    void disArm(List<BrushlessMotor> brushlessMotorList);
+    BrushlessMotor calibrate(BrushlessMotor brushlessMotor);
 
-    void changeMotorSpeed(List<BrushlessMotor> brushlessMotorList, int speed);
+    List<BrushlessMotor> arm(List<BrushlessMotor> brushlessMotorList, boolean isCalibrated);
+
+    BrushlessMotor arm(BrushlessMotor brushlessMotor, boolean isCalibrated);
+
+    List<BrushlessMotor> disArm(List<BrushlessMotor> brushlessMotorList);
+
+    BrushlessMotor disArm(BrushlessMotor brushlessMotor);
+
+    List<BrushlessMotor> changeMotorSpeed(List<BrushlessMotor> brushlessMotorList, int speed);
+
+    BrushlessMotor changeMotorSpeed(BrushlessMotor brushlessMotor, int speed);
 
 }

@@ -6,10 +6,16 @@ import com.muzammilpeer.quadcopter.model.BrushlessMotor;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class QuadCopterElectronicSpeedController extends MultipleElectronicSpeedControllerImpl {
 
     ArrayList<BrushlessMotor> motors;
+    public BrushlessMotor firstMotor;
+    public BrushlessMotor secondMotor;
+    public BrushlessMotor thirdMotor;
+    public BrushlessMotor forthMotor;
+
 
     private QuadCopterElectronicSpeedController() {
     }
@@ -17,54 +23,73 @@ public class QuadCopterElectronicSpeedController extends MultipleElectronicSpeed
     public QuadCopterElectronicSpeedController(int firstMotorBCM, int secondMotorBCM, int thirdMotorBCM, int forthMotorBCM) {
         motors = new ArrayList<BrushlessMotor>();
 
-        BrushlessMotor firstMotor = new BrushlessMotor(firstMotorBCM);
-        BrushlessMotor secondMotor = new BrushlessMotor(secondMotorBCM);
-        BrushlessMotor thirdMotor = new BrushlessMotor(thirdMotorBCM);
-        BrushlessMotor forthMotor = new BrushlessMotor(forthMotorBCM);
+        firstMotor = new BrushlessMotor(firstMotorBCM);
+        secondMotor = new BrushlessMotor(secondMotorBCM);
+        thirdMotor = new BrushlessMotor(thirdMotorBCM);
+        forthMotor = new BrushlessMotor(forthMotorBCM);
 
         motors.add(firstMotor);
         motors.add(secondMotor);
         motors.add(thirdMotor);
         motors.add(forthMotor);
 
-        initalizeQuadESC();
-        disarmQuadESC();
+        motors = (ArrayList<BrushlessMotor>) initalizeQuadESC();
+        motors = (ArrayList<BrushlessMotor>) disarmQuadESC();
     }
 
 
-    private void initalizeQuadESC() {
-        super.initializeAllESC(motors);
+    private List<BrushlessMotor> initalizeQuadESC() {
+        return super.initializeAllESC(motors);
     }
 
-    public void calibrateQuadESC() {
-        super.calibrate(motors);
+    public List<BrushlessMotor> calibrateQuadESC() {
+        return super.calibrate(motors);
     }
 
-    public void armQuadESC(boolean isCalibrated) {
-        super.arm(motors, isCalibrated);
+    public List<BrushlessMotor> armQuadESC(boolean isCalibrated) {
+        return super.arm(motors, isCalibrated);
     }
 
-    public void disarmQuadESC() {
-        super.disArm(motors);
+    public List<BrushlessMotor> disarmQuadESC() {
+        return super.disArm(motors);
     }
 
-    public void changeMotorSpeed(MotorEnum motorEnum, int speed) {
-        super.changeMotorSpeed(Arrays.asList(motors.get(motorEnum.ordinal())), speed);
+    public BrushlessMotor disarmESC(MotorEnum motorEnum) {
+        return super.disArm(Arrays.asList(motors.get(motorEnum.ordinal()))).get(0);
     }
 
-    public void changeMotorsSpeed(int speed) {
-        super.changeMotorSpeed(motors, speed);
+    public BrushlessMotor changeMotorSpeed(MotorEnum motorEnum, int speed) {
+        System.out.println("Inner Motor found Pin No = " + motors.get(motorEnum.ordinal()).getPwmHardwareBCMPin());
+        return super.changeMotorSpeed(Arrays.asList(motors.get(motorEnum.ordinal())), speed).get(0);
+    }
+
+    public List<BrushlessMotor> changeMotorsSpeed(int speed) {
+        return super.changeMotorSpeed(motors, speed);
     }
 
 
-    public void increaseMotorSpeed(MotorEnum motorEnum) {
+    public BrushlessMotor increaseMotorSpeed(MotorEnum motorEnum) {
         BrushlessMotor motor = motors.get(motorEnum.ordinal()).increaseSpeed();
         super.changeMotorSpeed(Arrays.asList(motor), motor.getCurrentSpeed());
+        return motor;
     }
 
-    public void decreaseMotorSpeed(MotorEnum motorEnum, int speed) {
+    public BrushlessMotor increaseMotorSpeed(BrushlessMotor motor) {
+        motor = motor.increaseSpeed();
+        motor = super.changeMotorSpeed(motor, motor.getCurrentSpeed());
+        return motor;
+    }
+
+    public List<BrushlessMotor> decreaseMotorSpeed(MotorEnum motorEnum) {
         BrushlessMotor motor = motors.get(motorEnum.ordinal()).decreaseSpeed();
         super.changeMotorSpeed(Arrays.asList(motor), motor.getCurrentSpeed());
+        return motors;
+    }
+
+    public BrushlessMotor decreaseMotorSpeed(BrushlessMotor motor) {
+        motor = motor.decreaseSpeed();
+        motor = super.changeMotorSpeed(motor, motor.getCurrentSpeed());
+        return motor;
     }
 
 }

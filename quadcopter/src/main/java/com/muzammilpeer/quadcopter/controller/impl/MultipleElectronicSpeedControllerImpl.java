@@ -2,8 +2,10 @@ package com.muzammilpeer.quadcopter.controller.impl;
 
 import com.muzammilpeer.quadcopter.config.AppConfig;
 import com.muzammilpeer.quadcopter.controller.MultipleElectronicSpeedController;
+import com.muzammilpeer.quadcopter.enums.MotorEnum;
 import com.muzammilpeer.quadcopter.enums.RunModeEnum;
 import com.muzammilpeer.quadcopter.model.BrushlessMotor;
+import com.pi4j.io.gpio.PinMode;
 import com.pi4j.wiringpi.Gpio;
 
 import java.util.List;
@@ -17,10 +19,18 @@ public abstract class MultipleElectronicSpeedControllerImpl implements MultipleE
 
     //For these calculation refer this link :
     // https://raspberrypi.stackexchange.com/questions/47300/answers-to-pwm-and-esc/76681#76681
-    final float DISARM_ESC_SPEED = 0.f;
+//    final float DISARM_ESC_SPEED = 0.f;
     public final float MIN_ESC_SPEED = PWM_RANGE * (6 / 100.f);  //6%
     public final float MAX_ESC_SPEED = PWM_RANGE * (12 / 100.f); //8%
     public final float ARM_ESC_SPEED = PWM_RANGE * (8 / 100.f);  //12%
+    final float DISARM_ESC_SPEED = 0.f;
+    //    public final float MIN_ESC_SPEED = (4096 - 1000) * 1 / 1000000;  //6%
+//    public final float MAX_ESC_SPEED = (4096 - 2000) * 1 / 1000000; //8%
+//    public final float ARM_ESC_SPEED = (4096 - 1500) * 1 / 1000000;  //12%
+//    public final float MIN_ESC_SPEED = 1000;  //6%
+//    public final float MAX_ESC_SPEED = 2000; //8%
+//    public final float ARM_ESC_SPEED = 1500;  //12%
+
     final float SPEED_RANGE = MAX_ESC_SPEED - MIN_ESC_SPEED;
 
     final int TIME_INTERVAL = 1000; // 1 second
@@ -34,7 +44,6 @@ public abstract class MultipleElectronicSpeedControllerImpl implements MultipleE
         // 19200000/192 = 100,000 //microseconds
         // 100,000/2000 = 50hz
 
-
         //Reference http://pijava.com/SePiServoControlExplained.html
         //I take my 50Hz * 20ms Period * 100 thing-a-ma-jigs Ratio = 100,000
         //To get my PWM Clock, I divide 19,200,000 / 100,000 = 192,
@@ -42,23 +51,27 @@ public abstract class MultipleElectronicSpeedControllerImpl implements MultipleE
 
 
         Gpio.wiringPiSetupGpio();
-        for (BrushlessMotor motor : brushlessMotorList) {
-            Gpio.pinMode(motor.getPwmHardwareBCMPin(), Gpio.PWM_OUTPUT);
-        }
         Gpio.pwmSetMode(Gpio.PWM_MODE_MS);
         Gpio.pwmSetClock(192); // 50Hz
-        Gpio.pwmSetRange(2000); // 2000 ms
+//        Gpio.pwmSetRange(2000); // 2000 ms
+
+        for (BrushlessMotor motor : brushlessMotorList) {
+//            Gpio.pinMode(motor.getPwmHardwareBCMPin(), Gpio.PWM_OUTPUT);
+            motor.getGpioPinPwmOutput().setPwmRange((int) PWM_RANGE);
+            motor.getGpioPinPwmOutput().setMode(PinMode.PWM_OUTPUT);
+        }
+
 
         return brushlessMotorList;
     }
 
     @Override
     public BrushlessMotor initializeESC(BrushlessMotor brushlessMotor) {
-        Gpio.wiringPiSetupGpio();
-        Gpio.pinMode(brushlessMotor.getPwmHardwareBCMPin(), Gpio.PWM_OUTPUT);
-        Gpio.pwmSetMode(Gpio.PWM_MODE_MS);
-        Gpio.pwmSetClock(192); // 50Hz
-        Gpio.pwmSetRange(2000); // 2000 ms
+//        Gpio.wiringPiSetupGpio();
+//        Gpio.pinMode(brushlessMotor.getPwmHardwareBCMPin(), Gpio.PWM_OUTPUT);
+//        Gpio.pwmSetMode(Gpio.PWM_MODE_MS);
+//        Gpio.pwmSetClock(192); // 50Hz
+//        Gpio.pwmSetRange(2000); // 2000 ms
         return null;
     }
 
@@ -159,11 +172,15 @@ public abstract class MultipleElectronicSpeedControllerImpl implements MultipleE
 
     @Override
     final public List<BrushlessMotor> changeMotorSpeed(List<BrushlessMotor> brushlessMotorList, int speed) {
+        System.out.println("BaseMotor count = " + brushlessMotorList.size());
         for (BrushlessMotor motor : brushlessMotorList) {
-            motor.setCurrentSpeed(Math.round((MIN_ESC_SPEED + calculateSpeed(speed))));
-            Gpio.pwmWrite(motor.getPwmHardwareBCMPin(), motor.getCurrentSpeed());
+            motor.setCurrentSpeed(Math.round((speed)));
+//            motor.setCurrentSpeed(Math.round((MIN_ESC_SPEED + calculateSpeed(speed))));
+//            Gpio.pwmWrite(motor.getPwmHardwareBCMPin(), motor.getCurrentSpeed());
+            motor.getGpioPinPwmOutput().setPwm(motor.getCurrentSpeed());
+
             if (AppConfig.CURRENT_MODE == RunModeEnum.DEBUG) {
-                System.out.println("MotorBCM[" + motor.getPwmHardwareBCMPin() + "] changeSpeedTo=" + motor.getCurrentSpeed() + "  calculateSpeed(speed) = " + speed);
+                System.out.println("MotorBCM[" + motor.getGpioPinPwmOutput().getName() + "] changeSpeedTo=" + motor.getCurrentSpeed() + "  calculateSpeed(speed) = " + speed);
             }
         }
         return brushlessMotorList;
@@ -174,15 +191,21 @@ public abstract class MultipleElectronicSpeedControllerImpl implements MultipleE
         if (speed <= 0) {
             brushlessMotor.setCurrentSpeed(0);
         } else {
-            brushlessMotor.setCurrentSpeed(Math.round((MIN_ESC_SPEED + calculateSpeed(speed))));
+//            brushlessMotor.setCurrentSpeed(Math.round((MIN_ESC_SPEED + calculateSpeed(speed))));
+            brushlessMotor.setCurrentSpeed(Math.round((speed)));
         }
 
-        Gpio.pwmWrite(brushlessMotor.getPwmHardwareBCMPin(), brushlessMotor.getCurrentSpeed());
+//        Gpio.pwmWrite(brushlessMotor.getPwmHardwareBCMPin(), brushlessMotor.getCurrentSpeed());
+        brushlessMotor.getGpioPinPwmOutput().setPwm(brushlessMotor.getCurrentSpeed());
+
         if (AppConfig.CURRENT_MODE == RunModeEnum.DEBUG) {
-            System.out.println("MotorBCM[" + brushlessMotor.getPwmHardwareBCMPin() + "] changeSpeedTo=" + brushlessMotor.getCurrentSpeed() + "  calculateSpeed(speed) = " + speed);
+            System.out.println("MotorBCM[" + brushlessMotor.getGpioPinPwmOutput().getName() + "] changeSpeedTo=" + brushlessMotor.getCurrentSpeed() + "  calculateSpeed(speed) = " + speed);
         }
         return brushlessMotor;
     }
 
-
+    @Override
+    public BrushlessMotor getMotor(MotorEnum motorEnum) {
+        return null;
+    }
 }

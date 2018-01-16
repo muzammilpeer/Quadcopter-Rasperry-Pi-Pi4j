@@ -1,10 +1,13 @@
 package com.muzammilpeer.quadcopter.controller;
 
+import com.muzammilpeer.quadcopter.enums.MotorEnum;
 import com.muzammilpeer.quadcopter.model.BrushlessMotor;
 
 import java.util.List;
 
 public interface MultipleElectronicSpeedController {
+
+    BrushlessMotor getMotor(MotorEnum motorEnum);
 
     List<BrushlessMotor> initializeAllESC(List<BrushlessMotor> brushlessMotorList);
 

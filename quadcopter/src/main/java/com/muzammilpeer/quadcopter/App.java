@@ -4,6 +4,7 @@ package com.muzammilpeer.quadcopter;
 import com.muzammilpeer.quadcopter.diozero.MPU6050;
 import com.muzammilpeer.quadcopter.diozero.QuaternionFilterForMPU6050;
 import com.muzammilpeer.quadcopter.diozero.Tools;
+import com.muzammilpeer.quadcopter.sensor.GY91;
 
 import java.io.IOException;
 
@@ -110,9 +111,9 @@ public class App {
 //        System.out.printf("Program end all ESC disarmed");
 
 
-        testMPU6050();
-//        GY91 gy91 = new GY91();
-//        gy91.readDataFromSensors();
+//        testMPU6050();
+        GY91 gy91 = new GY91();
+        gy91.readDataFromSensors();
     }
 
 
@@ -149,10 +150,8 @@ public class App {
             // Filtered angles
             Tools.log("Quaterion angles:");
             double[] filteredAngles = mpu6050.getFilteredAngles();
-            Tools.log("\t" + MPU6050.xyzValuesToString(MPU6050.angleToString(filteredAngles[0] - 180),
-                    MPU6050.angleToString(filteredAngles[1] - 270), MPU6050.angleToString(filteredAngles[2])));
-
-
+            Tools.log("\t" + MPU6050.xyzValuesToString(MPU6050.angleToString(filteredAngles[0]),
+                    MPU6050.angleToString(filteredAngles[1]), MPU6050.angleToString(filteredAngles[2])));
 //            mpu6050.MadgwickQuaternionUpdate(filteredAngles[1], filteredAngles[0], filteredAngles[2], gyroAngles[1], gyroAngles[0], gyroAngles[2]);
 //            quaternionFilterForMPU6050.MadgwickQuaternionUpdate(filteredAngles[0], filteredAngles[1], filteredAngles[2], gyroAngles[0], gyroAngles[1], gyroAngles[2]);
 

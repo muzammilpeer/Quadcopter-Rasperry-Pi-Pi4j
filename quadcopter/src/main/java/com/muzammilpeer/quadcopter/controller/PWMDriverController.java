@@ -9,6 +9,16 @@ import java.util.List;
 
 public interface PWMDriverController {
 
+    int getLowestSpeed();
+
+    int getMaxSpeed();
+
+    int getMinSpeed();
+
+    int getArmSpeed();
+
+    int getHardStopSpeed();
+
     List<BrushlessMotor> getBrushlessMotors();
 
     List<ServoMotor> getServoMotors();
@@ -30,5 +40,15 @@ public interface PWMDriverController {
     void changeMotorSpeed(List<? extends BaseMotor> motorList, int speed);
 
     void changeMotorSpeed(BaseMotor motor, int speed);
+
+    void increaseMotorSpeed(List<? extends BaseMotor> motorList);
+
+    void increaseMotorSpeed(BaseMotor motor);
+
+    void decreaseMotorSpeed(List<? extends BaseMotor> motorList);
+
+    void decreaseMotorSpeed(BaseMotor motor);
+
+    void shutdown();
 
 }

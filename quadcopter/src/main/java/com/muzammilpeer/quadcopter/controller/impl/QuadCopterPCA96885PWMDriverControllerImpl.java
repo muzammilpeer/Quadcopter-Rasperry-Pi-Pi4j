@@ -22,31 +22,69 @@ import java.util.List;
 
 public class QuadCopterPCA96885PWMDriverControllerImpl implements PWMDriverController {
 
-    private final int MIN_ESC_SPEED = 750;
+    private final int LOWEST_ESC_SPEED = 1000;
+    private final int MIN_ESC_SPEED = 1000;
     private final int MAX_ESC_SPEED = 2000;
     private final int ARM_ESC_SPEED = 1500;
-    private final int DISARM_ESC_SPEED = 1;
+    private final int DISARM_ESC_SPEED = 0;
     private final int TIME_INTERVAL = 1000; // 1 second
 
+    @Override
+    public int getLowestSpeed() {
+        return LOWEST_ESC_SPEED;
+    }
 
-    private GpioPinPwmOutput[] provisionPwmOutputs(final PCA9685GpioProvider gpioProvider) {
+    @Override
+    public int getMaxSpeed() {
+        return MAX_ESC_SPEED;
+    }
+
+    @Override
+    public int getMinSpeed() {
+        return MIN_ESC_SPEED;
+    }
+
+    @Override
+    public int getArmSpeed() {
+        return ARM_ESC_SPEED;
+    }
+
+    @Override
+    public int getHardStopSpeed() {
+        return DISARM_ESC_SPEED;
+    }
+    //
+//    private GpioPinPwmOutput[] provisionPwmOutputs(final PCA9685GpioProvider gpioProvider) {
+//        GpioController gpio = GpioFactory.getInstance();
+//        GpioPinPwmOutput myOutputs[] = {
+//                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_04, "ESC 00"),
+//                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_05, "ESC 01"),
+//                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_06, "ESC 02"),
+//                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_07, "ESC 03"),
+//                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_00, "Servo 00"),
+//                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_01, "Servo 01")};
+//        return myOutputs;
+//    }
+
+
+    private static GpioPinPwmOutput[] provisionPwmOutputs(final PCA9685GpioProvider gpioProvider) {
         GpioController gpio = GpioFactory.getInstance();
         GpioPinPwmOutput myOutputs[] = {
-                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_00, "ESC 00"),
-                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_01, "ESC 01"),
-                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_02, "ESC 02"),
-                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_03, "ESC 03"),
-                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_04, "Servo 04"),
-                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_05, "Servo 05"),
-                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_06, "not used"),
-                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_07, "not used"),
-                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_08, "not used"),
-                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_09, "not used"),
-                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_10, "not used"),
-                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_11, "not usedF"),
-                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_12, "not used"),
-                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_13, "not used"),
-                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_14, "not used"),
+                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_00, "Pulse 00"),
+                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_01, "Pulse 01"),
+                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_02, "Pulse 02"),
+                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_03, "Pulse 03"),
+                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_04, "Pulse 04"),
+                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_05, "Pulse 05"),
+                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_06, "Pulse 06"),
+                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_07, "Pulse 07"),
+                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_08, "Pulse 08"),
+                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_09, "Pulse 09"),
+                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_10, "Always ON"),
+                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_11, "Always OFF"),
+                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_12, "Servo pulse MIN"),
+                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_13, "Servo pulse NEUTRAL"),
+                gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_14, "Servo pulse MAX"),
                 gpio.provisionPwmOutputPin(gpioProvider, PCA9685Pin.PWM_15, "not used")};
         return myOutputs;
     }
@@ -73,10 +111,11 @@ public class QuadCopterPCA96885PWMDriverControllerImpl implements PWMDriverContr
         // Create custom PCA9685 GPIO provider
         I2CBus bus = I2CFactory.getInstance(I2CBus.BUS_1);
         pca9685GpioProvider = new PCA9685GpioProvider(bus, 0x40, frequency, frequencyCorrectionFactor);
-        // Define outputs in use for this example
+//        // Define outputs in use for this example
         GpioPinPwmOutput[] myOutputs = provisionPwmOutputs(pca9685GpioProvider);
         // Reset outputs
         pca9685GpioProvider.reset();
+
 
     }
 
@@ -95,16 +134,25 @@ public class QuadCopterPCA96885PWMDriverControllerImpl implements PWMDriverContr
 
 
     public QuadCopterPCA96885PWMDriverControllerImpl() {
+
+        try {
+//            checkForOverflow();
+            presetupPCA9685();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (I2CFactory.UnsupportedBusNumberException e) {
+            e.printStackTrace();
+        }
         brushlessMotors = new ArrayList<BrushlessMotor>();
         servoMotors = new ArrayList<ServoMotor>();
 
-        firstMotor = new BrushlessMotor(PCA9685Pin.PWM_00);
-        secondMotor = new BrushlessMotor(PCA9685Pin.PWM_01);
-        thirdMotor = new BrushlessMotor(PCA9685Pin.PWM_02);
-        forthMotor = new BrushlessMotor(PCA9685Pin.PWM_03);
+        firstMotor = new BrushlessMotor(PCA9685Pin.PWM_04);
+        secondMotor = new BrushlessMotor(PCA9685Pin.PWM_05);
+        thirdMotor = new BrushlessMotor(PCA9685Pin.PWM_06);
+        forthMotor = new BrushlessMotor(PCA9685Pin.PWM_07);
 
-        verticalServoMotor = new ServoMotor(PCA9685Pin.PWM_04);
-        horizontalServoMotor = new ServoMotor(PCA9685Pin.PWM_05);
+        verticalServoMotor = new ServoMotor(PCA9685Pin.PWM_00);
+        horizontalServoMotor = new ServoMotor(PCA9685Pin.PWM_01);
 
         brushlessMotors.add(firstMotor);
         brushlessMotors.add(secondMotor);
@@ -255,4 +303,32 @@ public class QuadCopterPCA96885PWMDriverControllerImpl implements PWMDriverContr
         }
     }
 
+    @Override
+    public void increaseMotorSpeed(List<? extends BaseMotor> motorList) {
+        for (BaseMotor motor : motorList) {
+            changeMotorSpeed(motor, motor.getCurrentSpeed() + 1);
+        }
+    }
+
+    @Override
+    public void increaseMotorSpeed(BaseMotor motor) {
+        changeMotorSpeed(motor, motor.getCurrentSpeed() + 1);
+    }
+
+    @Override
+    public void decreaseMotorSpeed(List<? extends BaseMotor> motorList) {
+        for (BaseMotor motor : motorList) {
+            changeMotorSpeed(motor, motor.getCurrentSpeed() - 1);
+        }
+    }
+
+    @Override
+    public void decreaseMotorSpeed(BaseMotor motor) {
+        changeMotorSpeed(motor, motor.getCurrentSpeed() - 1);
+    }
+
+    @Override
+    public void shutdown() {
+        pca9685GpioProvider.reset();
+    }
 }

@@ -1,9 +1,6 @@
 package com.muzammilpeer.quadcopter.model;
 
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinPwmOutput;
-import com.pi4j.io.gpio.Pin;
+import com.pi4j.io.gpio.*;
 
 public class BrushlessMotor extends BaseMotor {
 
@@ -23,27 +20,37 @@ public class BrushlessMotor extends BaseMotor {
     public BrushlessMotor(Pin pin) {
         super();
         this.pin = pin;
-        gpioPinPwmOutput = gpioController.provisionPwmOutputPin(pin);
+
+//        gpioPinPwmOutput = gpioController.provisionPwmOutputPin(pin);
     }
 
+    public int getCurrentSpeed() {
+        if (currentSpeed > 2000) {
+            currentSpeed = 2000;
+        } else if (currentSpeed < 750) {
+            currentSpeed = 750;
+        }
+        return currentSpeed;
+    }
 
     public void setCurrentSpeed(int currentSpeed) {
         isMoving = true;
 
         if (currentSpeed > 2000) {
             currentSpeed = 2000;
-        } else if (currentSpeed < 1) {
-            currentSpeed = 1;
+        } else if (currentSpeed < 750) {
+            currentSpeed = 750;
         }
 
         isMoving = true;
-        if (currentSpeed < 2) {
+        if (currentSpeed <= 750) {
             isMoving = false;
         }
 
         this.currentSpeed = currentSpeed;
-
     }
+
+
 //
 //    public int getPwmHardwareBCMPin() {
 //        return pwmHardwareBCMPin;
